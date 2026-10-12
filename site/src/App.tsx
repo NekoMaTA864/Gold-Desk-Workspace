@@ -1,9 +1,12 @@
-import {useCallback,useEffect,useRef,useState,type FormEvent} from 'react';
+import {useCallback,useEffect,useRef,useState,type CSSProperties,type FormEvent} from 'react';
 import {api,key} from './api';
 import Chart from './Chart';
 import LiveChart from './LiveChart';
 import {AgentSummary, EvidenceReview, RuleEditor, RuleReview, evaluateRules, loadRuleConfig} from './DecisionSupport';
 import type {RuleConfig} from './DecisionSupport';
+import {ChartHeightDivider,ColumnDivider,LayoutToolbar,readLayoutSelection} from './LayoutControls';
+import type {LayoutMode,LayoutPreset} from './LayoutControls';
+import PositionsCompact from './PositionsCompact';
 import type {Audit,BarsResponse,Case,Draft,Retrieval,Side,State} from './types';
 
 const actionName = (action:string) => ({FIRST:'首筆進場',ADD:'同向加倉',OPPOSITE:'反向部位',CLOSE:'平倉',SL:'停損',TP:'停利'}[action] || action);
@@ -24,16 +27,33 @@ function CaseRows({cases,onOpen}:{cases:Case[];onOpen:(id:string)=>void}) {
 }
 
 export default function App() {
+  const [layoutSeed]=useState(readLayoutSelection);
+  const [layoutMode,setLayoutMode]=useState<LayoutMode>(layoutSeed.mode);
+  const [layoutPreset,setLayoutPreset]=useState<LayoutPreset>(layoutSeed.preset);
+  const [splitWidth,setSplitWidth]=useState(layoutSeed.split);
+  const [chartHeight,setChartHeight]=useState(layoutSeed.height);
   const [marketView,setMarketView]=useState<'replay'|'live'>('replay');
   const [state,setState]=useState<State|null>(null),[bars,setBars]=useState<BarsResponse>(EMPTY_BARS),[audit,setAudit]=useState<Audit|null>(null),[pool,setPool]=useState<Retrieval|null>(null);
   const [interval,setInterval]=useState('5m'),[side,setSide]=useState<Side>('BUY'),[lot,setLot]=useState('0.10'),[sl,setSl]=useState(''),[tp,setTp]=useState('');
-  const [rightTab,setRightTab]=useState<'order'|'chat'>('order'),[bottomTab,setBottomTab]=useState('positions'),[draft,setDraft]=useState<Draft|null>(null),[selectedCase,setSelectedCase]=useState<Case|null>(null);
+  const [rightTab,setRightTab]=useState<'order'|'chat'>(layoutSeed.preset==='chart-focus'?'chat':'order'),[bottomTab,setBottomTab]=useState('positions'),[draft,setDraft]=useState<Draft|null>(null),[selectedCase,setSelectedCase]=useState<Case|null>(null);
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[light,setLight]=useState(()=>localStorage.getItem('gold-theme')==='light'),[message,setMessage]=useState('');
   const [chat,setChat]=useState<{role:'user'|'assistant';text:string}[]>([]);
   const [ruleConfig,setRuleConfig]=useState<RuleConfig>(loadRuleConfig);
   const [poolStatus,setPoolStatus]=useState<'loading'|'ready'|'error'>('loading');
   const ruleResults=evaluateRules(ruleConfig,state,bars,side,lot,interval);
   const changeRuleConfig=(next:RuleConfig)=>{setRuleConfig(next);localStorage.setItem('gold-desk-rules-v1',JSON.stringify(next));};
+  const choosePreset=(next:LayoutPreset)=>{setLayoutPreset(next);setRightTab(next==='chart-focus'?'chat':'order');setBottomTab('positions');};
+  const effectivePreset=marketView==='live'?'standard':layoutPreset;
+  const displayedChartHeight=layoutMode==='resize'?chartHeight:effectivePreset==='chart-focus'?500:345;
+  const workspaceStyle={'--layout-left':`${splitWidth}fr`,'--layout-right':`${100-splitWidth}fr`} as CSSProperties;
+  const chartStyle={'--chart-height':`${displayedChartHeight}px`} as CSSProperties;
+  useEffect(()=>{
+    localStorage.setItem('gold-desk-layout-v1',JSON.stringify({mode:layoutMode,preset:layoutPreset,split:splitWidth,height:chartHeight}));
+    const url=new URL(window.location.href);
+    url.searchParams.set('layout',layoutMode);
+    url.searchParams.set('preset',layoutPreset);
+    window.history.replaceState(null,'',url);
+  },[layoutMode,layoutPreset,splitWidth,chartHeight]);
   const reviewDialog=useRef<HTMLDialogElement>(null),caseDialog=useRef<HTMLDialogElement>(null),confirmKey=useRef({draft:'',key:''});
   const task=useCallback(async(fn:()=>Promise<void>)=>{setBusy(true);setError('');setNotice('');try{await fn();}catch(e){setError(e instanceof Error?e.message:'操作失敗，請重試。');}finally{setBusy(false);}},[]);
   const bootstrap=useCallback(()=>task(async()=>{const [next,a]=await Promise.all([api<State>('/state'),api<Audit>('/audit')]);setState(next);setAudit(a);}),[task]);
@@ -60,24 +80,28 @@ export default function App() {
   return <div className="terminal">
     <header className="topbar"><div className="brand"><span className="brand-mark">GD</span><div className="brand-copy"><small>GOLD DESK / WORKSPACE</small><strong>黃金交易工作台</strong></div><span className="proposal-tag">E 前端提案</span></div><div className="header-tools"><label className="sr-only" htmlFor="mode">交易模式</label><select id="mode" value={state?.mode||'replay'} disabled={busy||!state||marketView==='live'} onChange={e=>void task(async()=>{setState(await api<State>('/mode',{mode:e.target.value}));})}><option value="replay">歷史回放</option><option value="broker_demo">券商模擬帳戶</option></select><button className="theme-button" onClick={()=>setLight(v=>!v)} aria-label={light?'切換深色':'切換淺色'}>{light?'深色':'淺色'}</button><span className="connection"><i className={state?'status-dot':'status-dot offline'}/>{marketView==='live'?'外部看盤':state?.mode==='broker_demo'?'券商未連線':state?'本機回放':'連接中'}</span></div></header>
     <nav className="market-view-tabs" aria-label="工作台頁面"><button disabled={busy||!!draft} className={marketView==='replay'?'active':''} aria-pressed={marketView==='replay'} onClick={()=>setMarketView('replay')}>回放演練</button><button disabled={busy||!!draft} className={marketView==='live'?'active':''} aria-pressed={marketView==='live'} onClick={()=>setMarketView('live')}>即時看盤</button></nav>
+    <LayoutToolbar mode={layoutMode} preset={layoutPreset} onMode={setLayoutMode} onPreset={choosePreset} onReset={()=>{setSplitWidth(65);setChartHeight(420);}}/>
     <div className="source-strip"><span className="source-label">{marketView==='live'?'TradingView 外部行情':state?sourceName(state.data_source):'資料載入中'}</span><span>{marketView==='live'?'即時圖表僅供看盤；尚未串接即時下單與風險分析。':state?.mode==='broker_demo'?'尚未設定券商 demo；此模式無法送出訂單。':'行情依回放時間推進，成交為本機模擬。'}</span>{marketView==='replay'&&<time>{formatTime(state?.clock)}</time>}</div>
     {(error||notice)&&<div className={`feedback ${error?'error':'success'}`} role={error?'alert':'status'}><span>{error||notice}</span>{!state&&<button onClick={()=>void bootstrap()} disabled={busy}>重新連線</button>}<button className="text-button" aria-label="關閉通知" onClick={()=>{setError('');setNotice('');}}>×</button></div>}
-    <div className="workspace">
-      <main className="market-panel" aria-label="行情與回放">
-        {marketView==='live'?<LiveChart light={light}/>:<>
+    <div className={`workspace layout-grid preset-${effectivePreset} mode-${layoutMode}`} style={workspaceStyle}>
+      <main className="market-panel" aria-label="行情與回放" style={chartStyle}>
+        {marketView==='live'?<><LiveChart light={light}/><ChartHeightDivider active={layoutMode==='resize'} value={chartHeight} onChange={setChartHeight}/></>:<>
         <div className="instrument-header"><div><h1>XAU / USD <span>現貨黃金</span></h1><div className="market-subtitle">每手 100 oz · USD 計價</div></div><div className="quotes"><div><span>賣出價 BID</span><b className="negative">{state?.quote.bid||'—'}</b></div><div><span>買進價 ASK</span><b className="positive">{state?.quote.ask||'—'}</b></div></div></div>
         <div className="chart-toolbar"><div className="segments" aria-label="K 線週期">{['5m','15m','1h'].map(value=><button key={value} aria-pressed={interval===value} className={interval===value?'active':''} onClick={()=>setInterval(value)}>{value==='1h'?'1 小時':value==='5m'?'5 分':'15 分'}</button>)}</div><div className="legend"><span><i className="ma20"/>MA 20</span><span><i className="ma60"/>MA 60</span><span>已收盤 K 線</span></div></div>
         <div className="chart-area">{bars.bars.length?<Chart bars={bars.bars} markers={bars.markers} light={light}/>:<div className="chart-loading">{state?'此資料來源尚無可用行情。':'等待本機行情服務…'}</div>}</div>
+        <ChartHeightDivider active={layoutMode==='resize'} value={chartHeight} onChange={setChartHeight}/>
         <div className="market-stats"><span>區間變動 <b className={gainClass(state?.market.change_pct)}>{state?.market.change_pct||'—'}%</b></span><span>區間高 <b>{state?.market.high||'—'}</b></span><span>區間低 <b>{state?.market.low||'—'}</b></span><span>波動區間 <b>{state?.market.range_pct||'—'}%</b></span><span className="chart-source">{bars.source?sourceName(bars.source):'—'}</span></div>
         <div className="replay-toolbar"><div className="replay-title"><span className="status-dot"/>回放控制<span className="fine">僅顯示決策當時可見行情</span></div><div className="replay-buttons"><button disabled={busy||!state||state.mode!=='replay'} onClick={()=>void replay(1)}>下一根 <span>＋5m</span></button><button disabled={busy||!state||state.mode!=='replay'} onClick={()=>void replay(6)}>＋30 分</button><button disabled={busy||!state||state.mode!=='replay'} onClick={()=>void replay(12)}>＋1 小時</button><button className="text-button" disabled={busy||!state||state.mode!=='replay'} onClick={reset}>重設</button></div></div>
         <AgentSummary pool={pool} poolStatus={poolStatus} state={state} bars={bars} side={side} lot={lot} interval={interval} rules={ruleConfig} onOpenCase={id=>void openCase(id)}/>
         </>}
       </main>
+      <ColumnDivider active={layoutMode==='resize'} value={splitWidth} onChange={setSplitWidth}/>
       {marketView==='replay'?<aside className="order-panel" aria-label="訂單與對話"><div className="tabs right-tabs">{[['order','下單'],['chat','對話助手']].map(([value,label])=><button key={value} className={rightTab===value?'active':''} aria-pressed={rightTab===value} onClick={()=>setRightTab(value as 'order'|'chat')}>{label}</button>)}</div><div className="account-strip"><span>模擬淨值 <b>{state?.account.equity||'—'} <small>USD</small></b></span><span>餘額 <b>{state?.account.balance||'—'}</b></span></div>
       {rightTab==='order'?<form className="order-form" onSubmit={makeDraft}><div className="section-caption">市價訂單 <span>{actionName(currentAction)}</span></div><div className="side-switch"><button type="button" className={side==='SELL'?'selected sell':'sell'} aria-pressed={side==='SELL'} onClick={()=>setSide('SELL')}>賣出 SELL<span>{state?.quote.bid||'—'}</span></button><button type="button" className={side==='BUY'?'selected buy':'buy'} aria-pressed={side==='BUY'} onClick={()=>setSide('BUY')}>買進 BUY<span>{state?.quote.ask||'—'}</span></button></div><label htmlFor="lot">交易手數 <span>Lot</span></label><input id="lot" type="number" min="0.01" max="100" step="0.01" required value={lot} onChange={e=>setLot(e.target.value)}/><div className="two-fields"><div><label htmlFor="sl">停損 <span>選填</span></label><input id="sl" type="number" min="0.01" step="0.01" placeholder="未設定" value={sl} onChange={e=>setSl(e.target.value)}/></div><div><label htmlFor="tp">停利 <span>選填</span></label><input id="tp" type="number" min="0.01" step="0.01" placeholder="未設定" value={tp} onChange={e=>setTp(e.target.value)}/></div></div><div className="order-explainer"><span className="step-label">下單前檢查</span><p>先核對相似歷史案例與部位變化，再確認成交。沒有停損時，顯示價格情境損失。</p></div><button className="primary full" disabled={busy||!connected||!state}>{busy?'處理中…':`${actionName(currentAction)} · 檢查訂單`}</button><p className="fine">{state?.mode==='broker_demo'?'券商 demo 尚未連線，訂單已停用。':'將以回放報價在本機模擬成交。'}</p></form>:<div className="chat-panel"><div className="provider-label">{state?.llm_enabled?'已設定 LLM':'本機規則解析 · LLM 未設定'}</div><div className="chat-log" role="log" aria-live="polite">{chat.length===0?<div className="chat-intro"><h2>把想做的交易說清楚</h2><p>助手可以說明盤面、試算風險，並建立待確認草稿。</p><button onClick={()=>setMessage('買進 0.10 手')}>買進 0.10 手</button><button onClick={()=>setMessage('分析目前行情與風險')}>分析目前行情與風險</button><p className="fine">草稿仍會進入同一份案例與風險檢查。</p></div>:chat.map((item,index)=><div className={`chat-message ${item.role}`} key={index}><span>{item.role==='user'?'你':'助手'}</span><p>{item.text}</p></div>)}</div><form onSubmit={sendChat} className="chat-input"><label htmlFor="message" className="sr-only">輸入交易指令或問題</label><textarea id="message" value={message} onChange={e=>setMessage(e.target.value)} placeholder="例如：買進 0.10 手，或詢問部位風險" rows={3}/><button className="primary" disabled={busy||!message.trim()||!state}>送出</button></form></div>}
       <RuleEditor config={ruleConfig} onChange={changeRuleConfig} results={ruleResults}/>
       </aside>:<aside className="order-panel live-guide" aria-label="即時看盤說明"><span className="step-label">看盤工作區</span><h2>觀察現在的黃金行情</h2><p>使用圖表上方工具切換 K 線週期、加入指標；左側工具可以畫趨勢線。</p><h3>下單與風險分析</h3><p>尚未串接即時下單。現有訂單、部位損益與案例提示使用回放資料，請切回演練操作。</p><button className="primary full" onClick={()=>setMarketView('replay')}>返回回放演練</button><p className="fine">切換頁面會保留本次模擬持倉。即時圖表不會推進回放時間。</p></aside>}
-      {marketView==='replay'&&<section className="bottom-panel" aria-label="帳戶與案例資料"><div className="bottom-heading"><div className="tabs">{[['positions',`持倉 ${state?.positions.length||0}`],['history','成交紀錄'],['cases','相似案例'],['audit','資料分群']].map(([value,label])=><button key={value} className={bottomTab===value?'active':''} aria-pressed={bottomTab===value} onClick={()=>setBottomTab(value)}>{label}</button>)}</div><span className="fine">本機展示帳戶 · USD</span></div>
+      {marketView==='replay'&&<section className={`bottom-panel ${layoutPreset==='positions-right'&&bottomTab==='positions'?'compact-mode':''}`} aria-label="帳戶與案例資料"><div className="bottom-heading"><div className="tabs">{[['positions',`持倉 ${state?.positions.length||0}`],['history','成交紀錄'],['cases','相似案例'],['audit','資料分群']].map(([value,label])=><button key={value} className={bottomTab===value?'active':''} aria-pressed={bottomTab===value} onClick={()=>setBottomTab(value)}>{label}</button>)}</div><span className="fine">本機展示帳戶 · USD</span></div>
+      {bottomTab==='positions'&&layoutPreset==='positions-right'&&<PositionsCompact positions={state?.positions||[]} busy={busy} connected={Boolean(connected)} onClose={closePosition}/>}
       {bottomTab==='positions'&&<div className="table-scroll"><table><thead><tr><th>商品／時間</th><th>方向</th><th>手數</th><th>進場價</th><th>停損</th><th>停利</th><th>浮動損益 USD</th><th/></tr></thead><tbody>{state?.positions.map(p=><tr key={p.id}><td><strong>XAUUSD</strong><small>{formatTime(p.opened_at)}</small></td><td className={p.side==='BUY'?'positive':'negative'}>{sideName(p.side)}</td><td className="number">{p.lot}</td><td className="number">{p.entry}</td><td className="number">{p.sl||'—'}</td><td className="number">{p.tp||'—'}</td><td className={`number ${gainClass(p.pnl)}`}>{p.pnl}</td><td><button className="close-button" disabled={busy||!connected} onClick={()=>closePosition(p.id)}>平倉</button></td></tr>)}</tbody></table>{!state?.positions.length&&<div className="empty"><strong>目前沒有本機模擬持倉</strong><span>選擇買進或賣出、輸入手數，按「首筆進場 · 檢查訂單」開始。</span></div>}</div>}
       {bottomTab==='history'&&<div className="table-scroll"><table><thead><tr><th>成交編號／時間</th><th>方向</th><th>操作</th><th>手數</th><th>成交價</th><th>狀態</th><th>已實現損益 USD</th></tr></thead><tbody>{state?.orders.slice().reverse().map(o=><tr key={o.id}><td><strong>{o.id}</strong><small>{formatTime(o.time)}</small></td><td className={o.side==='BUY'?'positive':'negative'}>{sideName(o.side)}</td><td>{actionName(o.action)}</td><td className="number">{o.lot}</td><td className="number">{o.price}</td><td>{o.status==='FILLED'?'本機模擬成交':o.status}</td><td className={`number ${o.pnl?gainClass(o.pnl):''}`}>{o.pnl||'—'}</td></tr>)}</tbody></table>{!state?.orders.length&&<div className="empty">成交後可在此查看進場、加倉與平倉紀錄。</div>}</div>}
       {bottomTab==='cases'&&<div>{pool?<><Pool pool={pool}/><CaseRows cases={pool.cases} onOpen={id=>void openCase(id)}/><div className="limitations">{pool.limitations.map((text,index)=><p key={index}>{text}</p>)}</div></>:<div className="empty">案例檢索尚未完成；請確認服務與手數輸入。</div>}</div>}
