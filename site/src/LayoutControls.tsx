@@ -28,8 +28,8 @@ export function LayoutToolbar({mode,preset,onMode,onPreset,onReset}: {
     <div className="layout-toolbar-title"><span>工作台版型比較</span><small>同一份行情與草稿資料</small></div>
     <div className="layout-toolbar-controls">
       <div className="layout-choice" role="group" aria-label="調整方式">
-        <button type="button" aria-pressed={mode==='preset'} className={mode==='preset'?'active':''} onClick={()=>onMode('preset')}>預設版型</button>
-        <button type="button" aria-pressed={mode==='resize'} className={mode==='resize'?'active':''} onClick={()=>onMode('resize')}>拖分隔線</button>
+        <button type="button" aria-pressed={mode==='preset'} className={mode==='preset'?'active':''} onClick={()=>onMode('preset')}>固定版型</button>
+        <button type="button" aria-pressed={mode==='resize'} className={mode==='resize'?'active':''} onClick={()=>onMode('resize')}>自訂大小（拖拉）</button>
       </div>
       <label className="layout-preset-label" htmlFor="layout-preset">排列</label>
       <select id="layout-preset" value={preset} onChange={event=>onPreset(event.target.value as LayoutPreset)}>
@@ -39,7 +39,7 @@ export function LayoutToolbar({mode,preset,onMode,onPreset,onReset}: {
       </select>
       {mode==='resize'&&<button type="button" className="layout-reset" onClick={onReset}>重設大小</button>}
     </div>
-    <p className="layout-toolbar-help">{mode==='resize'?'拖動面板間的分隔線；也可聚焦分隔線後用方向鍵調整。':'選擇固定排列，觀察哪種流程更順手。'}</p>
+    <p className="layout-toolbar-help">{mode==='resize'?'拖動分隔線自訂面板大小；面板位置仍由上方排列決定。也可用方向鍵調整。':'從三種固定排列選擇最順手的工作流程。'}</p>
   </div>;
 }
 
