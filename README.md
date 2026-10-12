@@ -4,6 +4,8 @@
 
 三種 Agent 的可行性、責任分界與建議 JSON 見 [Agent 草案](docs/agent-feasibility.md)。這一輪先做桌面流程，手機版暫緩。
 
+已另以團隊網站 React／Vite 前端為基底建立 [E 改版網站](site/)。它保留原有的回放圖表與下單流程，接上新風格、個人提醒及證據充分性畫面。來源版本、預覽步驟與公開前事項見 [site README](site/README.md)。
+
 同步 repository：[NekoMaTA864/Gold-Desk-Workspace](https://github.com/NekoMaTA864/Gold-Desk-Workspace)。這個 repository 供家裡與公司同步專題工作區內容，與團隊的網站程式 repository 分開。
 
 ## Python 環境
