@@ -8,7 +8,7 @@
 - `src/DecisionSupport.tsx`：把既有案例檢索接到歷史 Agent 卡片；用「有限參考／資料不足／暫不可用」呈現證據狀態；加入三項可勾選的本機提醒。
 - `src/App.tsx`：在回放工作台與原有草稿確認視窗顯示新區塊；確認視窗分為部位風險、個人規則、歷史案例、證據充分性、條件式說明五區。
 - `tests/decision-support.test.ts`：檢查提醒計算、缺值與案例服務失敗的狀態區別。
-- `src/LayoutControls.tsx`、`src/layout-experiments.css`：同一頁提供三種固定排列及自訂大小（拖拉）模式；持倉面板與相鄰欄位自適應，提醒條件在右側第三個分頁；`tests/layout-controls.test.ts` 檢查網址參數與大小邊界。
+- `src/LayoutControls.tsx`、`src/layout-experiments.css`：同一頁提供三種固定排列及自訂大小（拖拉）模式；持倉面板與相鄰欄位自適應，空持倉時顯示帳戶摘要與下單入口，提醒條件在右側第三個分頁；`tests/layout-controls.test.ts` 檢查網址參數與大小邊界。
 
 提醒條件儲存在此瀏覽器的 `localStorage`，還沒有多裝置同步。MA20 使用現有回放狀態的 5 分鐘均線；K 棒條件使用目前選擇週期的已收盤圖表。歷史 Agent 目前只能比較原 repo 已實作的操作條件，沒有盤面相似度；因此有案例時也只顯示「有限參考」。沒有將案例比例當作本次交易勝率。
 
