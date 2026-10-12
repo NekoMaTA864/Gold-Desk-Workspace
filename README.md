@@ -1,6 +1,8 @@
 # Gold Desk 專題工作區
 
-這個資料夾先放本機 Python 虛擬環境、前端設計 skills、[五人分工表](docs/Gold%20Desk%20五人分工.md)與 E 分工筆記。網站程式仍以團隊的 Gold-Trading-Project repository 為準；這裡尚未複製或修改網站程式。
+這個資料夾放本機 Python 虛擬環境、前端設計 skills、[五人分工表](docs/Gold%20Desk%20五人分工.md)、E 分工筆記，以及 [可操作的桌面流程原型](prototype/)。團隊正式網站仍以 Gold-Trading-Project repository 為準；此原型是獨立展示稿，沒有修改團隊網站。
+
+三種 Agent 的可行性、責任分界與建議 JSON 見 [Agent 草案](docs/agent-feasibility.md)。這一輪先做桌面流程，手機版暫緩。
 
 同步 repository：[NekoMaTA864/Gold-Desk-Workspace](https://github.com/NekoMaTA864/Gold-Desk-Workspace)。這個 repository 供家裡與公司同步專題工作區內容，與團隊的網站程式 repository 分開。
 
@@ -19,7 +21,7 @@
 
 ## 已下載的 skills
 
-所有檔案放在 `.agents/skills/`。這些是第三方指引與附帶資源，尚未用它們修改網站。日後以此資料夾作為 Codex 工作目錄時，可在任務中指定需要的 skill；每次選與任務相符的少數項即可。
+所有檔案放在 `.agents/skills/`。這些是第三方指引與附帶資源。本次桌面原型參考 `ui-ux-pro-max` 的深色儀表板配色、對比與鍵盤焦點原則；未執行 skill 附帶的安裝程式。日後以此資料夾作為 Codex 工作目錄時，可在任務中指定需要的 skill；每次選與任務相符的少數項即可。
 
 | 本地目錄 | 來源 | 建議用途 |
 | --- | --- | --- |

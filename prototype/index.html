@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#07111e" />
+    <title>Gold Desk｜E 前端流程原型</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="rail" aria-label="工作台導覽">
+        <div class="brand-mark" aria-label="Gold Desk">G<span>D</span></div>
+        <div class="rail-line"></div>
+        <a class="rail-item active" href="#overview" aria-label="工作台" title="工作台">▦</a>
+        <a class="rail-item" href="#agents" aria-label="Agent 分析" title="Agent 分析">◈</a>
+        <a class="rail-item" href="#rules" aria-label="個人規則" title="個人規則">☷</a>
+        <div class="rail-bottom"><span class="avatar" aria-label="展示使用者">E</span></div>
+      </aside>
+
+      <main id="overview" class="main">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">GOLD DESK / WORKSPACE</div>
+            <h1>交易前決策工作台 <span class="prototype-tag">E 前端原型</span></h1>
+          </div>
+          <div class="top-actions">
+            <span class="mock-note">合成資料 · 僅供流程展示</span>
+            <span class="user-chip"><span class="avatar small">E</span> 操作者 Demo</span>
+          </div>
+        </header>
+
+        <section class="status-strip" aria-label="模式與資料狀態">
+          <div class="mode-switch" role="group" aria-label="展示模式">
+            <button class="mode active" type="button" data-mode="replay">歷史回放</button>
+            <button class="mode" type="button" data-mode="live">即時看盤</button>
+            <button class="mode" type="button" data-mode="broker">券商模擬</button>
+          </div>
+          <div class="status-items">
+            <div><span class="label">報價來源</span><strong id="quote-source">合成回放資料</strong></div>
+            <div><span class="label">更新時間</span><strong id="quote-time">展示時間 10:42:18</strong></div>
+            <div><span class="label">資料狀態</span><strong id="quote-status" class="status good">可參考</strong></div>
+            <div><span class="label">券商連線</span><strong id="broker-status" class="status neutral">未連接</strong></div>
+          </div>
+        </section>
+
+        <div class="scenario-bar">
+          <div><span class="eyebrow">DEMO CONTROLS</span><strong>展示情境</strong><small>切換後可查看完整退路與阻擋原因</small></div>
+          <div class="scenario-buttons" role="group" aria-label="選擇展示情境">
+            <button type="button" class="scenario active" data-scenario="normal">正常資料</button>
+            <button type="button" class="scenario" data-scenario="noCases">無相似案例</button>
+            <button type="button" class="scenario" data-scenario="llmFail">說明生成失敗</button>
+            <button type="button" class="scenario" data-scenario="stale">報價過期</button>
+            <button type="button" class="scenario" data-scenario="offline">券商斷線</button>
+          </div>
+        </div>
+
+        <div class="workspace-grid">
+          <div class="left-stack">
+            <section class="card market-card" aria-labelledby="market-heading">
+              <div class="section-head"><div><span class="eyebrow">MARKET CONTEXT</span><h2 id="market-heading">XAU/USD <span>黃金／美元</span></h2></div><span class="pill outline">展示 K 線</span></div>
+              <div class="market-number"><strong>2,651.80</strong><span class="positive">+12.40 (+0.47%)</span></div>
+              <div class="chart-wrap" aria-label="合成 K 線圖，僅供展示"><svg id="mock-chart" viewBox="0 0 760 235" preserveAspectRatio="none" role="img" aria-label="合成黃金 K 線走勢"></svg></div>
+              <div class="chart-footer"><span>1H · 合成走勢</span><span>MA20 <b class="gold-line"></b> 2,644.20</span><span>最近 3 根：2 陽 1 陰</span></div>
+            </section>
+
+            <section id="agents" class="card agent-card" aria-labelledby="agents-heading">
+              <div class="section-head"><div><span class="eyebrow">DECISION SUPPORT</span><h2 id="agents-heading">Agent 分析</h2></div><span class="pill quiet">分析資料 v0.1</span></div>
+              <div class="agent-grid">
+                <article class="agent-panel history-panel">
+                  <div class="agent-title"><span class="agent-icon">01</span><div><h3>歷史 Agent</h3><p>找相似交易，交代相似處與結果</p></div></div>
+                  <div id="history-content"></div>
+                </article>
+                <article class="agent-panel fallback-panel">
+                  <div class="agent-title"><span class="agent-icon">02</span><div><h3>回復 Agent</h3><p>說明案例是否足夠參考</p></div></div>
+                  <div id="sufficiency-content"></div>
+                </article>
+              </div>
+            </section>
+          </div>
+
+          <div class="right-stack">
+            <section class="card ticket-card" aria-labelledby="ticket-heading">
+              <div class="section-head"><div><span class="eyebrow">DRAFT ORDER</span><h2 id="ticket-heading">交易草稿</h2></div><span class="pill quiet">尚未送單</span></div>
+              <div class="side-switch" role="group" aria-label="交易方向"><button type="button" data-side="buy" class="active">買入 BUY</button><button type="button" data-side="sell">賣出 SELL</button></div>
+              <label class="field">商品 <input value="XAU/USD · 黃金" readonly /></label>
+              <label class="field">預計手數 <span class="input-wrap"><input id="lots" type="number" min="0.01" max="10" step="0.01" value="0.40" /><span>lots</span></span></label>
+              <div class="ticket-summary"><span>參考價格</span><strong>2,651.80</strong><span>草稿識別碼</span><strong>DEMO-ORDER-018</strong></div>
+              <button id="review-button" class="primary-button" type="button">查看五區確認摘要 <span aria-hidden="true">↗</span></button>
+              <p id="action-hint" class="action-hint">僅檢視流程，不會送出真實委託。</p>
+            </section>
+
+            <section id="rules" class="card rules-card" aria-labelledby="rules-heading">
+              <div class="section-head"><div><span class="eyebrow">PERSONAL AGENT</span><h2 id="rules-heading">我的提醒條件</h2></div><span class="pill gold">3 種範例</span></div>
+              <p class="section-intro">勾選你想觀察的條件。此版本只顯示提醒，不會自動交易。</p>
+              <div class="rule-list">
+                <label class="rule-row"><input id="rule-size" type="checkbox" checked /><span><strong>手數上限</strong><small>預計手數高於 <input id="size-limit" type="number" min="0.01" max="10" step="0.01" value="0.30" aria-label="手數上限" /> lots 時提醒</small></span><span id="rule-size-state" class="rule-state"></span></label>
+                <label class="rule-row"><input id="rule-ma" type="checkbox" checked /><span><strong>均線位置</strong><small>價格高於 MA20 時提醒</small></span><span id="rule-ma-state" class="rule-state"></span></label>
+                <label class="rule-row"><input id="rule-candle" type="checkbox" /><span><strong>K 棒形態</strong><small>最近 3 根至少 2 根陽線時提醒</small></span><span id="rule-candle-state" class="rule-state"></span></label>
+              </div>
+              <div id="rules-result" class="rule-result" aria-live="polite"></div>
+            </section>
+          </div>
+        </div>
+
+        <footer class="page-foot">Gold Desk · E 工作流展示 · 所有行情、案例及評估數值均為合成資料</footer>
+      </main>
+    </div>
+
+    <dialog id="review-dialog" class="review-dialog" aria-labelledby="review-title">
+      <div class="dialog-head"><div><span class="eyebrow">PRE-TRADE REVIEW</span><h2 id="review-title">五區確認摘要</h2><p>草稿 DEMO-ORDER-018 · 合成資料 · 不連接下單服務</p></div><button id="close-dialog" type="button" class="close-button" aria-label="關閉確認摘要">×</button></div>
+      <div class="review-body">
+        <section><div class="review-index">01</div><div><h3>部位與風險</h3><p id="review-risk"></p></div></section>
+        <section><div class="review-index">02</div><div><h3>個人規則</h3><p id="review-rules"></p></div></section>
+        <section><div class="review-index">03</div><div><h3>相似案例</h3><p id="review-history"></p></div></section>
+        <section><div class="review-index">04</div><div><h3>證據充分性</h3><p id="review-sufficiency"></p></div></section>
+        <section><div class="review-index">05</div><div><h3>說明與限制</h3><p id="review-explanation"></p></div></section>
+      </div>
+      <div class="dialog-foot"><span id="review-blocker"></span><button id="dismiss-dialog" type="button" class="primary-button">完成畫面檢查</button></div>
+    </dialog>
+    <dialog id="case-dialog" class="review-dialog case-dialog" aria-labelledby="case-title">
+      <div class="dialog-head"><div><span class="eyebrow">HISTORICAL CASE / SYNTHETIC</span><h2 id="case-title">案例詳情</h2><p>合成展示資料 · 不代表本次交易結果</p></div><button id="close-case" type="button" class="close-button" aria-label="關閉案例詳情">×</button></div>
+      <div id="case-detail" class="case-detail"></div>
+    </dialog>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
