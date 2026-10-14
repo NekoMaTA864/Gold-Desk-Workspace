@@ -54,8 +54,9 @@ export class DemoEngine {
   }
   const shown=bars.slice(-250),times=new Set(shown.map(b=>b.time));
   const markers:Marker[]=this.orders.flatMap(o=>{
-   const time=Math.floor(Number(o.time)/seconds)*seconds;if(!times.has(time))return [];
-   const buy=o.side==='BUY';return [{time,position:buy?'belowBar':'aboveBar',color:buy?'#44c4b0':'#e47c80',shape:o.action==='CLOSE'?'circle':buy?'arrowUp':'arrowDown',text:(o.action==='CLOSE'?'平倉':o.action==='FIRST'?'首筆':'加單')+' '+o.lot}];
+   if(o.status!=='FILLED')return [];
+   const eventTime=o.filled_at??o.time,time=Math.floor(Number(eventTime)/seconds)*seconds;if(!times.has(time))return [];
+   const buy=o.side==='BUY';return [{time,position:buy?'belowBar':'aboveBar',color:buy?'#44c4b0':'#e47c80',shape:o.action==='CLOSE'?'circle':buy?'arrowUp':'arrowDown',text:(o.action==='CLOSE'?'平倉':o.order_type==='LIMIT'?'限價成交':o.action==='FIRST'?'首筆':'加單')+' '+o.lot}];
   });
   return {bars:shown,markers:markers.sort((a,b)=>a.time-b.time),source,interval};
  }
@@ -81,10 +82,17 @@ export class DemoEngine {
    cases:[...ranked].sort((a,b)=>(d(a.profit).lt(0)?0:1)-(d(b.profit).lt(0)?0:1)||Number(a.distance)-Number(b.distance)||a.id.localeCompare(b.id)).slice(0,6),
    limitations:['全部合成案例，比例不代表交易員績效或本次預測勝率','先形成完整匹配池，再展示虧損優先','目前只比較操作條件，未啟用盤面相似度']};
  }
- draft(side:Side,lot:string,sl?:string|null,tp?:string|null):Draft{
+ draft(side:Side,lot:string,sl?:string|null,tp?:string|null,orderType:'MARKET'|'LIMIT'='MARKET',limitPrice?:string|null):Draft{
   this.connected();if(!['BUY','SELL'].includes(side))throw Error('請選 BUY 或 SELL');
   const qty=quantity(lot);if(qty.gt(100)||!qty.mod('.01').isZero())throw Error('手數範圍0.01至100，間隔0.01');
-  const price=d(this.quote()[side==='BUY'?'ask':'bid']),stop=sl?quantity(sl):null,target=tp?quantity(tp):null,sign=side==='BUY'?1:-1;
+  const quote=this.quote(),reference=d(quote[side==='BUY'?'ask':'bid']);
+  const price=orderType==='LIMIT'?quantity(limitPrice||''):reference;
+  if(orderType==='LIMIT'){
+   if(!price.mod('.01').isZero())throw Error('限價需以 0.01 為間隔');
+   if(side==='BUY'&&!price.lt(d(quote.ask)))throw Error('買進限價需低於目前 Ask');
+   if(side==='SELL'&&!price.gt(d(quote.bid)))throw Error('賣出限價需高於目前 Bid');
+  }
+  const stop=sl?quantity(sl):null,target=tp?quantity(tp):null,sign=side==='BUY'?1:-1;
   if(stop&&stop.minus(price).times(sign).gte(0))throw Error('停損必須在下單價格的不利方向');
   if(target&&target.minus(price).times(sign).lte(0))throw Error('停利必須在下單價格的有利方向');
   const before=sum(this.positions.map(p=>p.lot)),same=this.positions.filter(p=>p.side===side);
@@ -97,10 +105,10 @@ export class DemoEngine {
   const warnings=stop?[]:['未設定停損；價格情境不是損失上限'];
   if(this.positions.length){warnings.push('加單增加總部位；均價改善不代表風險降低');if(this.positions.some(p=>!p.sl))warnings.push('既有部位含未設定停損的訂單');}
   if(this.action(side)==='OPPOSITE')warnings.push('反向／混合持倉：回放採逐筆持倉，不能當券商淨額模式');
-  const result:Draft={id:id(),revision:this.version,side,lot:qty.toString(),sl:stop?.toString()||null,tp:target?.toString()||null,price:money(price),action:this.action(side),status:'REVIEW',
+  const result:Draft={id:id(),revision:this.version,side,lot:qty.toString(),sl:stop?.toString()||null,tp:target?.toString()||null,price:money(price),action:this.action(side),status:'REVIEW',order_type:orderType,
    risk:{before_lot:before.toString(),after_lot:before.plus(qty).toString(),average_entry:money(avg),stop_loss_usd:stop?money(price.minus(stop).abs().times(qty).times(100)):null,
     reward_risk:stop&&target?money(target.minus(price).abs().div(stop.minus(price).abs())):null,scenarios,warnings},
-   retrieval:this.retrieve(side,this.action(side),lot),explanation:'合成案例與瀏覽器情境試算；請自行核對後確認，尚未成交。'};
+   retrieval:this.retrieve(side,this.action(side),lot),explanation:orderType==='LIMIT'?'合成回放限價草稿；確認後先列為待成交，之後由回放 K 棒高低價判定是否觸價。':'合成案例與瀏覽器情境試算；請自行核對後確認，尚未成交。'};
   this.drafts.set(result.id,result);return structuredClone(result);
  }
  confirm(draftId:string,revision:number,key:string):Receipt{
@@ -108,11 +116,17 @@ export class DemoEngine {
   this.connected();if(!key||key.length>128)throw Error('缺少有效確認識別碼');
   const draft=this.drafts.get(draftId);if(!draft||draft.status!=='REVIEW')throw Error('訂單已取消或確認');
   if(revision!==this.version||draft.revision!==this.version)throw Error('價格或帳戶已更新，請重新檢查訂單');
-  const p:Position={id:id(),side:draft.side,lot:draft.lot,entry:draft.price,sl:draft.sl,tp:draft.tp,opened_at:this.clock,pnl:'0.00'};
-  this.positions.push(p);this.orders.push({id:p.id,side:p.side,lot:p.lot,price:p.entry,status:'FILLED',time:this.clock,action:draft.action});
-  draft.status='FILLED';this.version++;const result={status:'FILLED',order_id:p.id,state:this.state()};this.confirmations.set(cache,result);return result;
+   const orderId=id();
+   if(draft.order_type==='LIMIT'){
+    this.orders.push({id:orderId,side:draft.side,lot:draft.lot,price:draft.price,status:'PENDING',time:this.clock,action:draft.action,order_type:'LIMIT',filled_at:null,sl:draft.sl,tp:draft.tp});
+    draft.status='PENDING';this.version++;const result={status:'PENDING',order_id:orderId,state:this.state()};this.confirmations.set(cache,result);return result;
+   }
+   const p:Position={id:orderId,side:draft.side,lot:draft.lot,entry:draft.price,sl:draft.sl,tp:draft.tp,opened_at:this.clock,pnl:'0.00'};
+   this.positions.push(p);this.orders.push({id:p.id,side:p.side,lot:p.lot,price:p.entry,status:'FILLED',time:this.clock,action:draft.action,order_type:'MARKET',filled_at:this.clock});
+   draft.status='FILLED';this.version++;const result={status:'FILLED',order_id:p.id,state:this.state()};this.confirmations.set(cache,result);return result;
  }
  cancel(draftId:string){const draft=this.drafts.get(draftId);if(!draft||draft.status!=='REVIEW')throw Error('草稿已失效');draft.status='CANCELLED';return {status:'CANCELLED'};}
+ cancelOrder(orderId:string){const order=this.orders.find(item=>item.id===orderId&&item.status==='PENDING');if(!order)throw Error('待成交委託不存在或已處理');order.status='CANCELLED';this.version++;return {status:'CANCELLED',state:this.state()};}
  private closeAt(p:Position,price:Decimal):Receipt{
   const pnl=price.minus(p.entry).times(p.lot).times(100).times(p.side==='BUY'?1:-1);this.balance=this.balance.plus(pnl);this.positions=this.positions.filter(x=>x.id!==p.id);
   const orderId=id();this.orders.push({id:orderId,side:p.side==='BUY'?'SELL':'BUY',lot:p.lot,price:money(price),status:'FILLED',time:this.clock,action:'CLOSE',pnl:money(pnl)});this.version++;
@@ -131,7 +145,14 @@ export class DemoEngine {
     const buy=p.side==='BUY',adjust=buy?d(0):d('.30'),lo=d(bar.low).plus(adjust),hi=d(bar.high).plus(adjust),opening=d(bar.open).plus(adjust),stop=p.sl?d(p.sl):null,target=p.tp?d(p.tp):null;
     if(stop&&(buy?lo.lte(stop):hi.gte(stop)))this.closeAt(p,buy?Decimal.min(stop,opening):Decimal.max(stop,opening));
     else if(target&&(buy?hi.gte(target):lo.lte(target)))this.closeAt(p,target);
-   }this.version++;
+    }
+    for(const order of this.orders.filter(item=>item.status==='PENDING')){
+     const limit=d(order.price),touched=order.side==='BUY'?d(bar.low).plus('.30').lte(limit):d(bar.high).gte(limit);
+     if(!touched)continue;
+     const p:Position={id:order.id,side:order.side,lot:order.lot,entry:order.price,sl:order.sl||null,tp:order.tp||null,opened_at:bar.time+300,pnl:'0.00'};
+     this.positions.push(p);order.status='FILLED';order.filled_at=bar.time+300;
+    }
+    this.version++;
   }return this.state();
  }
  caseDetail(caseId:string):Case{
@@ -143,10 +164,15 @@ export class DemoEngine {
  chat(message:string,side?:Side){
   const requested=/賣|做空|\bSELL\b/i.test(message)?'SELL':/買|做多|\bBUY\b/i.test(message)?'BUY':message.includes('改')?side:null;
   const lot=message.match(/(\d+(?:\.\d+)?)\s*(?:手|lots?\b)/i);
-  if(requested&&lot&&!/不要|別|不買|不賣|取消|不用/.test(message)){
-   const draft=this.draft(requested,lot[1],message.match(/停損\s*([0-9]+(?:\.[0-9]+)?)/)?.[1],message.match(/停利\s*([0-9]+(?:\.[0-9]+)?)/)?.[1]);
-   return {message:'已準備'+draft.lot+'手草稿，尚未成交。這是本地規則解析，請核對案例與風險後自行確認。',draft,provider:'local_rules'};
+  const explicitOrder=/\b(?:buy|sell)\b|買進|賣出|買入|賣出|做多|做空|下單|掛單|準備訂單/.test(message.toLowerCase());
+  const hypothetical=/如果|假設|例如|說明|比較|分析|怎麼|是否|要不要|會不會|提醒|條件|規則|建議|應該|適合|嗎[？?]?$|[？?]|不買|不賣|取消|不用|不要|別/.test(message);
+  if(requested&&lot&&explicitOrder&&!hypothetical){
+   const isLimit=/限價|掛單/.test(message),limit=message.match(/(?:委託價格|委託價|價格|價位|@)\s*(?:在|為|是|[:：])?\s*([0-9]+(?:\.[0-9]+)?)/)?.[1];
+   if(isLimit&&!limit)return {message:'限價草稿需要目標價格。請輸入例如「限價買進 0.10 手，價格 2920」。',draft:null,provider:'local_rules'};
+   const draft=this.draft(requested,lot[1],message.match(/停損\s*([0-9]+(?:\.[0-9]+)?)/)?.[1],message.match(/停利\s*([0-9]+(?:\.[0-9]+)?)/)?.[1],isLimit?'LIMIT':'MARKET',limit);
+   return {message:isLimit?'已準備限價掛單草稿，尚未送出或成交。請核對風險與目標價格後確認。':'已準備'+draft.lot+'手市價草稿，尚未成交。這是本地規則解析，請核對案例與風險後自行確認。',draft,provider:'local_rules'};
   }
+  if(hypothetical&&requested&&lot)return {message:'我先把這句當作情境討論，沒有建立訂單。若要準備草稿，請明確輸入「買進／賣出 0.10 手」或「限價買進 0.10 手，價格 2920」。',draft:null,provider:'local_rules'};
   const m=this.state().market;return {message:`本地助手：目前合成回放最近60根5分K變化 ${m.change_pct}%，區間 ${m.low} 至 ${m.high}；這是數值描述，不是買賣建議。可以輸入「買進黃金0.1手」準備待確認草稿。`,draft:null,provider:'local_rules'};
  }
 }
@@ -163,9 +189,10 @@ export async function browserAPI(path:string,body?:unknown):Promise<unknown>{
  else if(route==='/replay/reset')result=session.reset();
  else if(route==='/replay/step')result=session.step(Number(input.bars));
  else if(route==='/mode'){if(!['replay','broker_demo'].includes(String(input.mode)))throw Error('不支援的模式');session.mode=input.mode as State['mode'];session.version++;result=session.state();}
- else if(route==='/drafts')result=session.draft(input.side as Side,String(input.lot),input.sl as string|null,input.tp as string|null);
+ else if(route==='/drafts')result=session.draft(input.side as Side,String(input.lot),input.sl as string|null,input.tp as string|null,input.order_type==='LIMIT'?'LIMIT':'MARKET',input.limit_price as string|null);
  else if(/^\/drafts\/[^/]+\/confirm$/.test(route))result=session.confirm(route.split('/')[2],Number(input.revision),String(input.idempotency_key||''));
  else if(/^\/drafts\/[^/]+\/cancel$/.test(route))result=session.cancel(route.split('/')[2]);
+ else if(/^\/orders\/[^/]+\/cancel$/.test(route))result=session.cancelOrder(route.split('/')[2]);
  else if(/^\/positions\/[^/]+\/close$/.test(route)){if(input.confirmed!==true)throw Error('需要使用者確認平倉');result=session.close(route.split('/')[2],String(input.idempotency_key||''));}
  else if(route==='/chat')result=session.chat(String(input.message||''),input.side as Side);
  else throw Error('公開示範不支援此操作');
