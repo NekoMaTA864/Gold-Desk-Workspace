@@ -6,7 +6,7 @@ export type AssistantLayout = 'balanced' | 'order-left' | 'conversation-focus';
 
 export const clampSplit = (value:number) => Math.max(40,Math.min(74,Math.round(value)));
 export const clampChartHeight = (value:number) => Math.max(280,Math.min(640,Math.round(value)));
-export const clampAssistantInfoWidth = (value:number) => Math.max(190,Math.min(310,Math.round(value)));
+export const clampAssistantInfoWidth = (value:number) => Math.max(240,Math.min(340,Math.round(value)));
 export const clampAssistantOrderWidth = (value:number) => Math.max(300,Math.min(440,Math.round(value)));
 
 export function readAssistantLayoutSelection(): {mode:LayoutMode;layout:AssistantLayout;infoWidth:number;orderWidth:number} {
@@ -17,7 +17,7 @@ export function readAssistantLayoutSelection(): {mode:LayoutMode;layout:Assistan
   return {
     mode:(query.get('assistantSizing')||stored.mode)==='resize'?'resize':'preset',
     layout:requestedLayout==='order-left'||requestedLayout==='conversation-focus'?requestedLayout:'balanced',
-    infoWidth:typeof stored.infoWidth==='number'&&Number.isFinite(stored.infoWidth)?clampAssistantInfoWidth(stored.infoWidth):245,
+    infoWidth:typeof stored.infoWidth==='number'&&Number.isFinite(stored.infoWidth)?clampAssistantInfoWidth(stored.infoWidth):270,
     orderWidth:typeof stored.orderWidth==='number'&&Number.isFinite(stored.orderWidth)?clampAssistantOrderWidth(stored.orderWidth):355,
   };
 }
@@ -79,8 +79,8 @@ export function LayoutToolbar({mode,preset,onMode,onPreset,onReset}: {
   mode:LayoutMode;preset:LayoutPreset;
   onMode:(next:LayoutMode)=>void;onPreset:(next:LayoutPreset)=>void;onReset:()=>void;
 }) {
-  return <div className="layout-toolbar" aria-label="工作台版型比較">
-    <div className="layout-toolbar-title"><span>工作台版型比較</span><small>同一份行情與草稿資料</small></div>
+  return <div className="layout-toolbar" aria-label="回放版面設定">
+    <div className="layout-toolbar-title"><span>回放版面</span><small>安排圖表、下單與紀錄</small></div>
     <div className="layout-toolbar-controls">
       <div className="layout-choice" role="group" aria-label="調整方式">
         <button type="button" aria-pressed={mode==='preset'} className={mode==='preset'?'active':''} onClick={()=>onMode('preset')}>固定版型</button>
@@ -94,7 +94,7 @@ export function LayoutToolbar({mode,preset,onMode,onPreset,onReset}: {
       </select>
       {mode==='resize'&&<button type="button" className="layout-reset" onClick={onReset}>重設大小</button>}
     </div>
-    <p className="layout-toolbar-help">{mode==='resize'?'拖動分隔線自訂面板大小；面板位置仍由上方排列決定。也可用方向鍵調整。':'從三種固定排列選擇最順手的工作流程。'}</p>
+    <p className="layout-toolbar-help">{mode==='resize'?'拖動分隔線調整大小，也可用方向鍵微調。':'選擇排列；行情與草稿資料不會改變。'}</p>
   </div>;
 }
 

@@ -10,16 +10,16 @@
   border-radius:9px;
 }
 .layout-toolbar-title { display:grid; gap:3px; min-width:116px; }
-.layout-toolbar-title span { color:var(--ink); font-size:12px; font-weight:700; }
-.layout-toolbar-title small { color:var(--muted); font-size:10px; }
+.layout-toolbar-title span { color:var(--ink); font-size:14px; font-weight:700; }
+.layout-toolbar-title small { color:var(--muted); font-size:12px; }
 .layout-toolbar-controls { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .layout-choice { display:flex; gap:3px; padding:3px; border-radius:7px; background:var(--bg); }
-.layout-choice button { border:0; padding:7px 11px; font-size:11px; background:transparent; color:var(--muted); }
+.layout-choice button { border:0; padding:8px 11px; font-size:12px; background:transparent; color:var(--muted); }
 .layout-choice button.active { background:var(--raised); color:var(--primary); }
-.layout-preset-label { font-size:10px; color:var(--muted); }
-.layout-toolbar select { padding:7px 9px; font-size:11px; background:var(--bg); }
-.layout-reset { font-size:10px; padding:8px 9px; }
-.layout-toolbar-help { flex:1 1 100%; margin:0; color:var(--muted); font-size:10px; }
+.layout-preset-label { font-size:12px; color:var(--muted); }
+.layout-toolbar select { padding:8px 9px; font-size:12px; background:var(--bg); }
+.layout-reset { font-size:12px; padding:8px 9px; }
+.layout-toolbar-help { flex:1 1 100%; margin:0; color:var(--muted); font-size:12px; }
 
 .workspace.layout-grid {
   display:grid;
