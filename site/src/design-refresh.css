@@ -176,6 +176,7 @@ dialog h3 { color:var(--ink); }
   padding: 15px 30px 30px;
 }
 .demo-entry-button { padding:7px 9px; border-color:var(--line); color:var(--muted); background:var(--raised); font-size:10px; white-space:nowrap; }
+.demo-user-badge { max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:7px 9px; border:1px solid color-mix(in srgb,var(--primary) 40%,var(--line)); border-radius:7px; color:var(--primary); font-size:11px; }
 .entry-page { min-height:100dvh; padding:28px; background:radial-gradient(circle at 10% 15%,color-mix(in srgb,var(--primary) 10%,transparent),transparent 36%),var(--bg); }
 .entry-shell { width:min(1080px,100%); margin:0 auto; }
 .entry-brand { display:flex; align-items:center; gap:12px; color:var(--primary); font-size:10px; font-weight:800; letter-spacing:.12em; }
@@ -188,16 +189,46 @@ dialog h3 { color:var(--ink); }
 .entry-demo { border-color:color-mix(in srgb,var(--primary) 50%,var(--line)); }
 .entry-step { color:var(--primary); font-size:10px; font-weight:800; letter-spacing:.08em; }
 .entry-card h2 { margin:16px 0 7px; color:var(--ink); font-size:22px; }
-.entry-card p,.entry-card li { color:var(--muted); font-size:12px; line-height:1.7; }
+.entry-card p,.entry-card li { color:var(--muted); font-size:13px; line-height:1.65; }
 .entry-card p { margin:0; }
 .entry-card ul { padding-left:17px; margin:18px 0 24px; }
-.entry-card button { align-self:flex-start; margin-top:auto; padding:11px 16px; font-size:12px; }
+.entry-card button { align-self:flex-start; margin-top:auto; padding:11px 16px; font-size:13px; }
 .entry-login-fields { display:grid; gap:7px; margin-top:18px; }
-.entry-login-fields label { color:var(--muted); font-size:10px; }
+.entry-login-fields label { color:var(--muted); font-size:12px; }
 .entry-login-fields input { width:100%; padding:10px 12px; margin-bottom:5px; background:var(--bg); border:1px solid var(--line); border-radius:7px; color:var(--muted); }
 .entry-login-fields input:disabled { opacity:.65; }
 .entry-login small { margin-top:9px; color:var(--muted); font-size:10px; }
 .entry-disclaimer { margin:18px 0; color:var(--muted); font-size:11px; }
+.entry-tabs { display:flex; gap:4px; margin:22px 0 2px; padding:4px; border:1px solid var(--line); border-radius:9px; background:var(--bg); }
+.entry-card .entry-tabs button { flex:1; margin:0; padding:9px 12px; border-color:transparent; background:transparent; color:var(--muted); font-size:13px; }
+.entry-card .entry-tabs button[aria-pressed="true"] { border-color:color-mix(in srgb,var(--primary) 40%,var(--line)); background:var(--surface); color:var(--primary); }
+.entry-card .entry-tabs button:focus-visible,.entry-card .entry-password-field button:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.entry-login .entry-auth-action { margin-top:19px; }
+.entry-login .entry-footnote { margin-top:11px; font-size:12px; }
+.entry-login .entry-preview-note { margin:14px 0 0; padding:10px 12px; border-left:3px solid var(--warn); border-radius:0 6px 6px 0; background:color-mix(in srgb,var(--warn) 8%,var(--surface)); color:var(--ink); font-size:12px; }
+.entry-login-form { display:grid; gap:7px; margin-top:17px; }
+.entry-login-form label { color:var(--ink); font-size:13px; font-weight:650; }
+.entry-login-form input { box-sizing:border-box; width:100%; min-height:40px; padding:10px 12px; border:1px solid var(--line); border-radius:7px; outline:none; background:var(--bg); color:var(--ink); font:inherit; font-size:14px; }
+.entry-login-form input:focus { border-color:var(--primary); box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 20%,transparent); }
+.entry-login-form .entry-auth-action { width:100%; margin-top:12px; }
+.entry-register-form { display:grid; gap:7px; margin-top:17px; }
+.entry-register-form label { color:var(--ink); font-size:13px; font-weight:650; }
+.entry-register-form label span { color:var(--muted); font-size:11px; font-weight:400; }
+.entry-register-form input { box-sizing:border-box; width:100%; min-width:0; min-height:40px; padding:10px 12px; border:1px solid var(--line); border-radius:7px; outline:none; background:var(--bg); color:var(--ink); font:inherit; font-size:14px; }
+.entry-register-form input:focus { border-color:var(--primary); box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 20%,transparent); }
+.entry-register-form input::placeholder { color:var(--muted); opacity:.8; }
+.entry-register-form small { margin:-2px 0 5px; color:var(--muted); font-size:11px; line-height:1.5; }
+.entry-password-field { position:relative; }
+.entry-password-field input { padding-right:60px; }
+.entry-card .entry-password-field button { position:absolute; top:50%; right:7px; transform:translateY(-50%); margin:0; padding:5px 7px; border:0; background:transparent; color:var(--primary); font-size:12px; }
+.entry-role-note { display:grid; gap:4px; margin-top:9px; padding:11px 12px; border:1px solid var(--line); border-radius:7px; background:var(--raised); }
+.entry-role-note strong { color:var(--ink); font-size:12px; }
+.entry-role-note span { color:var(--muted); font-size:11px; line-height:1.5; }
+.entry-register-form .entry-auth-action { width:100%; justify-self:stretch; margin-top:9px; }
+.entry-form-error { margin:2px 0 !important; color:var(--negative,#f08080) !important; font-size:12px !important; }
+.entry-preview-result { display:grid; gap:10px; margin-top:18px; padding:16px; border:1px solid color-mix(in srgb,var(--primary) 40%,var(--line)); border-radius:8px; background:var(--raised); }
+.entry-preview-result strong { color:var(--ink); font-size:15px; }
+.entry-card .entry-preview-result button { justify-self:start; margin:3px 0 0; }
 .order-outcome { display:flex; align-items:center; gap:13px; margin:0 0 14px; padding:13px 16px; border:1px solid color-mix(in srgb,var(--positive) 50%,var(--line)); border-radius:9px; background:color-mix(in srgb,var(--surface) 90%,var(--positive) 5%); }
 .order-outcome-icon { display:grid; place-items:center; flex:0 0 33px; height:33px; border-radius:50%; background:color-mix(in srgb,var(--positive) 16%,var(--surface)); color:var(--positive); font-size:18px; }
 .order-outcome h2 { margin:3px 0; color:var(--ink); font-size:13px; }
