@@ -40,12 +40,15 @@ export default function EntryGate({onDemo,onSignIn}: {onDemo:()=>void;onSignIn:(
   return <main className="entry-page">
     <div className="entry-shell">
       <div className="entry-brand"><span className="brand-mark">GD</span><span>GOLD DESK / 黃金交易助手</span></div>
-      <div className="entry-intro"><span className="assistant-eyebrow">TRADE WITH CONTEXT</span><h1>從交易想法到下單前檢查</h1><p>透過對話或表單建立草稿，再逐項核對報價、風險、個人規則與歷史案例。</p></div>
+      <div className="entry-intro"><span className="assistant-eyebrow">黃金交易 · 模擬體驗</span><h1>把交易想法說清楚，<br/>確認之後再下一步。</h1><p>用對話或表單整理黃金交易草稿，核對部位風險、個人提醒與可參考案例。</p></div>
       <div className="entry-options">
-        <section className="entry-card entry-demo"><span className="entry-step">01 · 現在可用</span><h2>進入合成展示</h2><p>使用瀏覽器內的合成行情與模擬帳戶，體驗完整草稿、回放與確認流程。</p><ul><li>不需帳號，也不會連接券商</li><li>展示資料只留在目前瀏覽器工作階段</li></ul><button type="button" className="primary" onClick={onDemo}>進入展示工作台 →</button></section>
-        <section className="entry-card entry-login"><span className="entry-step">02 · 本地帳號展示</span><h2>團隊帳號</h2><p>可先用測試資料走完註冊與登入流程。這不是正式驗證；後續由 A 的後端接管帳號和權限。</p>
+        <section className="entry-card entry-demo"><span className="entry-step">免註冊 · 無真實資金交易</span><h2>先體驗一筆模擬交易</h2><p>使用合成行情與模擬帳戶，從建立草稿到查看結果，熟悉完整流程。</p><button type="button" className="primary" onClick={onDemo}>開始模擬體驗 →</button><p className="entry-session-note">交易資料僅保留於本次工作階段。</p></section>
+        <aside className="entry-journey" aria-label="體驗流程"><ol><li><span>01</span><div><strong>描述想法</strong><p>選擇方向、手數與預計價格。</p></div></li><li><span>02</span><div><strong>核對重點</strong><p>查看風險、個人提醒與案例限制。</p></div></li><li><span>03</span><div><strong>確認並查看結果</strong><p>記錄模擬委託，再用回放觀察變化。</p></div></li></ol></aside>
+      </div>
+      <details className="entry-account-preview"><summary><span>想試用註冊與登入？</span><span>展開帳號體驗</span></summary>
+        <section className="entry-card entry-login"><span className="entry-step">帳號流程預覽</span><h2>註冊與登入</h2><p>可用測試資料走完帳號流程。這是暫存展示帳號，尚無跨裝置同步與正式身分驗證。</p>
           <div className="entry-tabs" role="group" aria-label="帳號功能"><button type="button" aria-pressed={tab==='login'} onClick={()=>switchTab('login')}>登入</button><button type="button" aria-pressed={tab==='register'} onClick={()=>switchTab('register')}>註冊</button></div>
-          {tab==='login'?<div className="entry-login-panel"><p className="entry-preview-note">先在「註冊」建立暫存展示帳號。重新整理頁面後，帳號就會清除；請勿使用真實密碼。</p><form className="entry-login-form" onSubmit={previewLogin}><label htmlFor="team-account">帳號或電子郵件</label><input id="team-account" type="text" autoComplete="username" required value={identifier} onChange={event=>{setIdentifier(event.target.value);setError('');}} placeholder="輸入帳號名稱或電子郵件"/><label htmlFor="team-password">密碼</label><input id="team-password" type="password" autoComplete="current-password" required value={loginPassword} onChange={event=>{setLoginPassword(event.target.value);setError('');}} placeholder="輸入展示密碼"/>{error&&<p className="entry-form-error" role="alert">{error}</p>}<button type="submit" className="entry-auth-action">登入展示帳號</button></form><p className="entry-footnote">登入後使用同一份合成交易資料；帳號間的資料隔離待 A 後端接入。</p></div>
+          {tab==='login'?<div className="entry-login-panel"><p className="entry-preview-note">先在「註冊」建立暫存展示帳號。重新整理頁面後，帳號就會清除；請勿使用真實密碼。</p><form className="entry-login-form" onSubmit={previewLogin}><label htmlFor="team-account">帳號或電子郵件</label><input id="team-account" type="text" autoComplete="username" required value={identifier} onChange={event=>{setIdentifier(event.target.value);setError('');}} placeholder="輸入帳號名稱或電子郵件"/><label htmlFor="team-password">密碼</label><input id="team-password" type="password" autoComplete="current-password" required value={loginPassword} onChange={event=>{setLoginPassword(event.target.value);setError('');}} placeholder="輸入展示密碼"/>{error&&<p className="entry-form-error" role="alert">{error}</p>}<button type="submit" className="entry-auth-action">登入展示帳號</button></form><p className="entry-footnote">登入後共用本次合成交易資料，尚未提供各帳號獨立紀錄。</p></div>
           :<div className="entry-register-panel">
             {previewComplete?<div className="entry-preview-result" role="status"><strong>暫存展示帳號已建立</strong><p>現在可用帳號名稱或電子郵件登入。帳號只存在於這次頁面開啟期間；重新整理後即清除，沒有建立正式帳號。</p><button type="button" onClick={()=>switchTab('login')}>前往登入 →</button></div>
             :<><p className="entry-preview-note">只用測試資料和測試密碼。資料留在此頁的暫存記憶體，不會送到伺服器；重新整理後清除。</p><form className="entry-register-form" onSubmit={previewRegistration}>
@@ -55,12 +58,12 @@ export default function EntryGate({onDemo,onSignIn}: {onDemo:()=>void;onSignIn:(
               <label htmlFor="register-password">密碼</label><div className="entry-password-field"><input id="register-password" type={showPassword?'text':'password'} autoComplete="new-password" required value={password} onChange={event=>{setPassword(event.target.value);setError('');}} aria-describedby="register-password-hint" placeholder="至少 8 個字元"/><button type="button" onClick={()=>setShowPassword(value=>!value)} aria-label={showPassword?'隱藏密碼':'顯示密碼'}>{showPassword?'隱藏':'顯示'}</button></div><small id="register-password-hint">至少 8 個字元；不要求英文大小寫、數字或符號。</small>
               <label htmlFor="register-confirmation">再次輸入密碼</label><input id="register-confirmation" type="password" autoComplete="new-password" required value={confirmation} onChange={event=>{setConfirmation(event.target.value);setError('');}} placeholder="再輸入一次以確認"/>
               {error&&<p className="entry-form-error" role="alert">{error}</p>}
-              <div className="entry-role-note"><strong>展示身分：一般使用者</strong><span>本地登入只展示操作流程，不提供權限保護；正式操作者由 A 的後端指派。</span></div>
+              <div className="entry-role-note"><strong>展示身分：一般使用者</strong><span>本地登入只展示操作流程，不提供帳號權限保護。</span></div>
               <button type="submit" className="entry-auth-action">建立暫存展示帳號</button>
             </form></>}
           </div>}
         </section>
-      </div>
+      </details>
       <p className="entry-disclaimer">合成展示不是真實報價或交易服務。未連接券商時，不會顯示券商送單成功。</p>
     </div>
   </main>;
