@@ -1,0 +1,10 @@
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import IntegrationShell from './IntegrationShell';
+import './styles.css';
+import './workspaceRefresh.css';
+import './productDesk.css';
+import './secondaryPages.css';
+import './integration.css';
+import './entry-integration.css';
+createRoot(document.getElementById('root')!).render(<React.StrictMode><IntegrationShell/></React.StrictMode>);
