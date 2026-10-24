@@ -21,6 +21,16 @@
 .pd-public.pd-view-assistant .topbar,.pd-public.pd-view-replay .topbar,.pd-public.pd-view-assistant .assistant-titlebar{display:none}
 .pd-public-header-actions{display:flex;align-items:center;gap:8px}
 .pd-public-header-actions button{min-height:36px}
+@media(min-width:941px){
+ .pd-public.pd-route-secondary .pd-market{min-height:60px;padding:8px 24px}
+ .pd-public.pd-route-secondary .pd-symbol{font-size:17px}
+ .pd-public.pd-route-secondary .pd-symbol small{display:inline;margin-left:10px}
+ .pd-public.pd-route-secondary .pd-page-heading{padding:14px 24px 10px}
+ .pd-public.pd-route-secondary .pd-page-heading h1{font-size:22px}
+ .pd-public.pd-route-secondary .pd-page-heading p{font-size:12px;margin-top:3px}
+ .pd-public.pd-route-secondary .pd-page-outline button:hover,.pd-public.pd-route-secondary .pd-page-outline button:focus-visible{background:var(--raised);color:var(--ink)}
+ .pd-public.pd-route-secondary #market-workspace{scroll-margin-top:75px}
+}
 .pd-public.pd-view-assistant .assistant-workspace{max-width:none;margin:0;padding:10px 24px 24px}
 .pd-public.pd-view-assistant .assistant-conversation .chat-log{flex:1;height:auto;max-height:none;min-height:320px;overflow-y:auto}
 .pd-public.pd-view-assistant .assistant-conversation .chat-input{padding:12px 0 0}
