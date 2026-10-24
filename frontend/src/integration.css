@@ -60,15 +60,17 @@
 
 /* Public conversation: the discussion is the desk; account facts and ticket share one inspector. */
 .pd-public.pd-view-assistant .assistant-inspector-tabs{display:none}
+.pd-public.pd-view-assistant .assistant-conversation .assistant-card-heading h1{margin:0;font-size:15px;line-height:1.2}
 @media(min-width:941px){
+ .pd-public.pd-view-assistant .pd-page-heading{display:none}
  .pd-public.pd-view-assistant .source-strip{min-height:34px;padding-top:7px;padding-bottom:7px;margin-bottom:0}
  .pd-public.pd-view-assistant .assistant-workspace{padding-top:14px}
  .pd-public.pd-view-assistant .assistant-flow{display:none}
  .pd-public.pd-view-assistant .assistant-main-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,350px);grid-template-rows:44px minmax(0,1fr);gap:0 16px;align-items:stretch}
- .pd-public.pd-view-assistant .assistant-conversation{grid-column:1;grid-row:1/3;min-height:560px;height:clamp(560px,calc(100dvh - 285px),790px);border-radius:14px;box-shadow:none}
+ .pd-public.pd-view-assistant .assistant-conversation{grid-column:1;grid-row:1/3;min-height:620px;height:clamp(620px,calc(100dvh - 205px),870px);border-radius:14px;box-shadow:none}
  .pd-public.pd-view-assistant .assistant-conversation .assistant-card-heading{min-height:66px;flex-direction:row;align-items:center;justify-content:space-between;padding:14px 24px}
  .pd-public.pd-view-assistant .assistant-conversation .assistant-card-heading>div{display:grid;gap:3px}
- .pd-public.pd-view-assistant .assistant-conversation .assistant-card-heading strong{font-size:17px;letter-spacing:-.02em}
+ .pd-public.pd-view-assistant .assistant-conversation .assistant-card-heading h1{margin:0;font-size:17px;line-height:1.2;font-weight:700;letter-spacing:-.02em}
  .pd-public.pd-view-assistant .assistant-conversation .assistant-card-heading small{font-size:11px;color:var(--muted)}
  .pd-public.pd-view-assistant .assistant-compose-jump{margin:0;background:transparent;color:var(--primary);border-color:var(--line);font-size:12px}
  .pd-public.pd-view-assistant .assistant-compose-jump:hover{background:var(--raised);color:var(--ink)}
@@ -92,7 +94,7 @@
  .pd-public.pd-view-assistant .assistant-inspector-tabs button{border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:650}
  .pd-public.pd-view-assistant .assistant-inspector-tabs button[aria-pressed=true]{background:var(--raised);color:var(--primary)}
  .pd-public.pd-view-assistant .assistant-inspector-tabs button:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
- .pd-public.pd-view-assistant .assistant-context,.pd-public.pd-view-assistant .assistant-order-dock{grid-column:2;grid-row:2;display:block;min-width:0;max-height:calc(clamp(560px,calc(100dvh - 285px),790px) - 44px);overflow-y:auto;border-top:0;border-radius:0 0 11px 11px;box-shadow:none}
+ .pd-public.pd-view-assistant .assistant-context,.pd-public.pd-view-assistant .assistant-order-dock{grid-column:2;grid-row:2;display:block;min-width:0;max-height:calc(clamp(620px,calc(100dvh - 205px),870px) - 44px);overflow-y:auto;border-top:0;border-radius:0 0 11px 11px;box-shadow:none}
  .pd-public.pd-view-assistant .assistant-context .assistant-card-heading,.pd-public.pd-view-assistant .assistant-context .assistant-context-actions,.pd-public.pd-view-assistant .assistant-context .assistant-integrations{grid-column:auto}
  .pd-public.pd-view-assistant .assistant-context .assistant-quote-strip,.pd-public.pd-view-assistant .assistant-context .assistant-context-block{margin-left:15px;margin-right:15px}
  .pd-public.pd-view-assistant .assistant-main-grid[data-inspector=context] .assistant-order-dock,.pd-public.pd-view-assistant .assistant-main-grid[data-inspector=order] .assistant-context{display:none}
