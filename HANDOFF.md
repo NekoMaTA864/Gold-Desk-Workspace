@@ -1,5 +1,11 @@
 # Gold Desk 交接紀錄
 
+## 2026-10-24：公開 Pages 三頁工作台統一
+
+將公開版的交易對話、歷史回放、即時看盤放進同一組左側目錄、頁首與頁面標題；對話頁保留既有聊天、帳戶提醒、委託草稿與入口流程。窄桌面優先顯示對話和草稿，帳戶資訊排在下方；手機以橫向頂部目錄及單欄內容呈現。對話頁的本頁目錄可跳至聊天及帳戶；回放頁的版面還原移到共用頁首，避免原頁首留下空白。一般後端模式的對話工作台不改。
+
+修改：`frontend/src/DeskRouteFrame.tsx`、`frontend/src/App.tsx`、`frontend/src/integration.css`。驗證：`tsx --test tests/*.test.ts`（PowerShell 展開檔名）103 passed；`npm run build:pages` 成功；本機 Pages 模式瀏覽器檢查三頁切換、回放還原控制及 390px 手機版。未變更 API、案例檢索規則、私人資料或實際券商委託；Pages 仍為公開合成展示。下一步以 GitHub Actions 和公開 Pages 檢查發布結果。
+
 ## 2026-10-24：整合至 NekoMaTA864/Gold-Desk-Workspace
 
 以 eb047ca 團隊版本整合前後端與原本站介面。frontend/ 為現行建置來源，site/ 保留；五區核對只呈現既有結果，不重寫確認或排名。前端 103 passed、兩種 build 通過，後端 463 passed。詳細檔案、部署範圍與回復方式見 [整合交接](docs/integration-20261024.md)。私人資料與秘密不進 Git。Pages 是公開展示，受保護雲端後端待後續完成。
