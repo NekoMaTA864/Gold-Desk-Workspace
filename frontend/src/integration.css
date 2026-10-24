@@ -24,6 +24,8 @@
 .pd-public.pd-view-assistant .assistant-workspace{max-width:none;margin:0;padding:10px 24px 24px}
 .pd-public.pd-view-assistant .assistant-conversation .chat-log{flex:1;height:auto;max-height:none;min-height:320px;overflow-y:auto}
 .pd-public.pd-view-assistant .assistant-conversation .chat-input{padding:12px 0 0}
+.pd-public.pd-view-assistant .assistant-compose-jump{margin-left:auto;padding:8px 12px;font-size:12px;font-weight:650;color:var(--primary-ink);border-color:var(--primary);background:var(--primary)}
+.pd-public.pd-view-assistant .assistant-compose-jump:hover{background:color-mix(in oklch,var(--primary) 90%,var(--ink) 10%)}
 .pd-public.pd-view-assistant #assistant-chat,.pd-public.pd-view-assistant #assistant-account{scroll-margin-top:110px}
 @media(max-width:1450px){
  .pd-public.pd-view-assistant .assistant-main-grid{grid-template-columns:minmax(0,1fr) minmax(300px,355px)}
