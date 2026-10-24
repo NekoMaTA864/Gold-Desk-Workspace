@@ -11,3 +11,16 @@ site/pnpm-workspace.yaml
 .env.*
 !.env.example
 private/
+
+# Private/runtime state and reproducible public-data downloads
+.npm-cache/
+.pytest_cache/
+*.sqlite
+*.sqlite3
+*.db
+*.dpapi
+*.log
+qa/
+artifacts/
+research/artifacts/
+frontend/public/data/

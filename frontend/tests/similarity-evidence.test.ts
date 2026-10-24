@@ -1,0 +1,87 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {DemoEngine} from '../src/demo';
+import {poolDescription,comparisonValue} from '../src/similarityPresentation';
+import {createElement} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {PoolEvidence,CaseEvidence} from '../src/SimilarityEvidence';
+
+test('dual path evidence shows two candle paths and state without legacy indicator rerank',()=>{
+ const r=new DemoEngine().retrieve('BUY','FIRST','.1');
+ r.comparison={...r.comparison!,mode:'candidate_market',method:'dual_path_structure_v1',basis:'direction_and_dual_path',
+  reason:'相同前高低狀態優先'};
+ const item={...r.cases[0],retrieval_method:'dual_path_structure_v1' as const,candidate_tier:'full' as const,
+  path_rank:.1,hour_path_rank:.2,path_distance_pct:.12,hour_path_distance_pct:.3,
+  structure_label:'前20棒區間內',query_structure_label:'前20棒區間內',structure_match:true,volatility_ratio:1.4};
+ const panel=renderToStaticMarkup(createElement(PoolEvidence,{pool:r}));
+ const detail=renderToStaticMarkup(createElement(CaseEvidence,{item}));
+ assert.match(panel,/雙週期/);assert.match(panel,/一小時/);
+ assert.doesNotMatch(panel,/前 15|技術指標＋固定型態|三段走勢型態相同的案例提前/);
+ assert.match(detail,/0.120/);assert.match(detail,/0.300/);assert.match(detail,/1.40/);
+ assert.doesNotMatch(detail,/技術指標|與本次型態相同/);
+});
+
+test('public demo explicitly reports direction-only synthetic evidence',()=>{
+ const r=new DemoEngine().retrieve('BUY','FIRST','.1');
+ assert.equal(r.comparison?.mode,'operation_only');
+ assert.equal(r.comparison?.market_matches,0);
+ assert(r.cases.every(c=>c.distance===null));
+ assert(r.cases.every(c=>c.market_comparison?.status==='unavailable'));
+ const text=poolDescription(r);
+ assert.match(text.market,/無法比較/);
+ assert.doesNotMatch(text.market,/盤面條件接近/);
+});
+
+test('rendered synthetic evidence does not reuse lot-weighted or verified-market copy',()=>{
+ const pool=new DemoEngine().retrieve('BUY','FIRST','.1');
+ const poolText=renderToStaticMarkup(createElement(PoolEvidence,{pool}));
+ const caseText=renderToStaticMarkup(createElement(CaseEvidence,{item:pool.cases[0]}));
+ assert.doesNotMatch(poolText,/同方向／操作類型中|40%|60%/);
+ assert.doesNotMatch(caseText,/操作距離|比較方向、首筆／加倉與手數/);
+ assert.match(caseText,/合成示範 · 僅依買賣方向列出/);
+});
+
+test('local reference mode leads with market comparison and separates the limited tier',()=>{
+ const r=new DemoEngine().retrieve('BUY','FIRST','.1');
+ r.comparison={...r.comparison!,mode:'candidate_market',clock_status:'UNKNOWN',basis:'direction_and_market',
+  reason:'券商時鐘未核實；尚未盲評',query_pattern_code:'UDU',
+  query_market_text:'進場前已收60根5分鐘K線；首尾收盤變動 1.00%。',rerank_window:15};
+ r.five_minute_only_total=3;
+ const text=poolDescription(r);
+ assert.match(text.market,/參考盤面/);
+ assert.match(text.market,/五分鐘限定/);
+ assert.match(text.operation,/只篩買進／賣出方向/);
+ assert.doesNotMatch(text.operation,/手數權重|40%|60%/);
+ const panel=renderToStaticMarkup(createElement(PoolEvidence,{pool:r}));
+ assert.match(panel,/歷史案例 · 參考盤面比對/);
+ assert.match(panel,/如何檢索與行情來源/);
+ assert.match(panel,/本次三段走勢/);
+ assert.match(panel,/首尾收盤變動 1.00%/);
+ const item={...r.cases[0],candidate_tier:'full' as const,path_rank:0.12,
+  path_distance_pct:0.5,indicator_rank:0.2,pattern_code:'UDU',pattern_match:true,
+  market_state_text:'歷史盤面固定描述'};
+ const candidate=renderToStaticMarkup(createElement(CaseEvidence,{item}));
+ assert.match(candidate,/K 線收盤路徑/);
+ assert.match(candidate,/與本次型態相同/);
+ assert.match(candidate,/歷史盤面固定描述/);
+ assert.doesNotMatch(panel,/候選盤面 · 券商時鐘未核實/);
+});
+
+test('empty strict market pool explains rejection without relabeling operation candidates as matches',()=>{
+ const r=new DemoEngine().retrieve('BUY','FIRST','.1');
+ r.total=0;r.cases=[];
+ r.comparison={...r.comparison!,mode:'market_and_operation',market_features_enabled:true,
+  market_matches:0,operation_candidates:10,verified_market_candidates:3,
+  reason:'沒有同時通過操作與盤面條件的案例'};
+ const text=poolDescription(r);
+ assert.match(text.market,/沒有/);
+ assert.match(text.operation,/10/);
+ assert.doesNotMatch(text.market,/10.*接近/);
+});
+
+test('comparison values are readable without rounding unknown to zero',()=>{
+ assert.equal(comparisonValue('1.428571428571428571'), '1.429');
+ assert.equal(comparisonValue(null), '資料不足');
+ assert.equal(comparisonValue('0'), '0');
+ assert.equal(comparisonValue('NaN'), '資料不足');
+});
