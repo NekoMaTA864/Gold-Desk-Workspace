@@ -2,6 +2,8 @@
 
 [開啟公開展示](https://nekomata864.github.io/Gold-Desk-Workspace/)
 
+組員接手請先讀 [目前 Pages 能力與下一步](docs/pages-current-handoff-20261025.md)，再依工作項目查看 `TEAM_HANDOFF.md`、`API_CONTRACT.md` 與角色文件。
+
 整合團隊案例檢索與交易工作台，以及原本站的體驗入口、使用指引、資料來源說明與五區委託核對。確認流程保留人工操作。
 
 | | GitHub Pages 公開展示 | 本機完整服務 |
