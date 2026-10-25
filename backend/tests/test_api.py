@@ -18,6 +18,18 @@ def test_form_and_chat_both_produce_review_without_order(client):
     assert not client.get('/api/state').json()['positions']
 
 
+def test_local_data_readiness_separates_case_index_from_replay_market(client):
+    response=client.get('/api/data/readiness')
+    assert response.status_code==200
+    assert response.headers['cache-control']=='no-store'
+    value=response.json()
+    assert value['case_source']==engine.cases.source
+    assert value['case_count']==len(engine.cases.items)
+    assert value['candidate_profile_status']==engine.cases.candidate_profile_status
+    assert value['replay_market_is_synthetic']==('合成' in engine.data_source)
+    assert client.get('/api/data/readiness',headers={'origin':'https://example.invalid'}).status_code==403
+
+
 def test_api_cannot_close_without_user_confirmation(client):
     d=client.post('/api/drafts',json={'side':'SELL','lot':'0.1'}).json()
     p=client.post(f'/api/drafts/{d["id"]}/confirm',json={'revision':d['revision'],'idempotency_key':'fill'}).json()['state']['positions'][0]
@@ -46,7 +58,18 @@ def test_adjustment_requires_explicit_size_and_side(client):
 
 def test_case_detail_shows_only_candidate_pre_entry_candles(client):
     result=client.get('/api/cases').json()
-    detail=client.get('/api/cases/'+result['cases'][0]['id']).json()
+    if result['cases']:
+        case_id=result['cases'][0]['id']
+    else:
+        # Real private cases cannot be matched against the bundled synthetic replay.
+        assert engine.cases.source == 'trader_history'
+        assert result['candidate_market_unavailable_reason']=='QUERY_UNAVAILABLE'
+        engine.cases.ensure_candidate_profiles()
+        assert engine.cases.candidate_profile_status=='READY'
+        case_id=next(c['id'] for c in engine.cases.items
+                     if c['available_at']<=engine.clock and c['id'] in engine.cases.candidate_profiles
+                     and engine.cases.candidate_profiles[c['id']]['as_of']<=engine.clock)
+    detail=client.get('/api/cases/'+case_id).json()
     assert detail['markers']==[]
     assert detail['chart_reason']
     if engine.cases.source == 'trader_history':

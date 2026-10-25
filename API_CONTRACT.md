@@ -1,5 +1,9 @@
 # Frontend API contract v1
 
+## 2026-10-25 本機資料就緒狀態
+
+`GET /api/data/readiness` 僅允許本機 client／Host／Origin，回傳 `Cache-Control:no-store`。回傳 `{case_source:'trader_history'|'synthetic_demo',case_count:number,candidate_profile_status:string,replay_market_is_synthetic:boolean}`，只含來源與校驗狀態，不含案例列、帳戶或金鑰。讀取時執行既有候選側檔完整性校驗；`candidate_profile_status:'READY'` 只代表私有側檔通過校驗，不代表這次回放或即時查詢有合格行情與匹配案例。公開 Pages 不呼叫此端點。
+
 ## 2026-10-23 即時量能（本機）
 
 原生技術盤面各週期新增`volume_activity:{status,last,mean20,ratio,baseline_count,relation}`；數量／平均／倍率皆十進位字串或null，relation為ABOVE／BELOW／EQUAL或null。status為AVAILABLE／INSUFFICIENT_HISTORY／GAPPED_BASELINE／UNKNOWN_VOLUME／ZERO_BASELINE。最後21根已收棒需連續；ratio=末根tick量／此前20根均量，形成棒排除。真實0保持0，均量0不除。

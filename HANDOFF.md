@@ -1,5 +1,41 @@
 # Gold Desk 交接紀錄
 
+## 2026-10-25：工作台文字改為使用者優先（本地預覽）
+
+保留展示登入與訪客入口、交易對話／回放演練／即時看盤三頁、持倉與資料來源資訊，將入口、頂部選單及連線面板的開發規劃文字改成使用者可理解的功能和目前狀態。頂部改為「資料來源」「服務狀態」；服務面板簡述使用身分、對話解讀、即時報價與持倉、歷史案例與盤面的可用情況，底部只留一行「後續預留」供教授辨識未來接入方向。仍明示展示帳號未經驗證、行情未連線及回放盤面的資料界線。修改 `frontend/src/EntryGate.tsx`、`IntegrationShell.tsx`、`ConnectionCenter.tsx`、`integration.css`；沒有改動交易或身分驗證邏輯。`npm run build` 及前端 103 項測試通過；本機瀏覽器目視確認入口與服務面板。網址 `http://127.0.0.1:8765/`，只留本地，未推送或部署。
+
+## 2026-10-25：本機資料就緒與即時服務核對
+
+新增本機專用 `GET /api/data/readiness`，只回傳案例來源、案例數、候選側檔校驗狀態與回放行情是否合成，不回傳案例列或帳戶資料；`ConnectionCenter.tsx` 增加「歷史案例與盤面」，區分私有案例側檔已驗證與本次盤面查詢尚未就緒，並將 cTrader `NOT_CONFIGURED` 明示為「尚未設定」。更新 `backend/app.py`、`backend/tests/test_api.py`、`frontend/src/ConnectionCenter.tsx`、`API_CONTRACT.md`。本機 Python 獨立檢查得到 `trader_history` 11902 筆、候選側檔 `READY` 10887 筆；回放行情仍是合成，`private/audit.json` 與 `.env.ctrader` 不存在。重啟 8765 服務後 API 與瀏覽器均確認新狀態。`/api/assistant/status` 為未設定，`/api/broker/market` 和已收 K 線為 `NOT_CONFIGURED`，即時案例查詢回 `BROKER_QUOTE_UNAVAILABLE`；關閉模型、關閉案例查詢的即時對話回 `local_market_rules`／`market_unavailable` 且沒有草稿。後端相關假串流／API 測試 40 passed，前端 103 passed，一般建置通過。沒有真實券商連線、模型呼叫或送單；只留本地，未推送或部署。
+
+## 2026-10-25：帳號與連線前端接點（本地預覽）
+
+工作台頂部新增可收合的「帳號與連線」，保留展示身分、AI 解讀與 cTrader DEMO 三條接入路徑。完整模式開啟面板時讀取 `/api/assistant/status` 與 `/api/broker/market`，顯示實際連線狀態或取不到狀態；公開模式不呼叫私人後端。未提供自備 API Key 輸入或假授權按鈕，因正式帳號、資源隔離與安全保存尚未完成。保留原本登入入口、三頁工作台與資料來源說明。修改 `frontend/src/ConnectionCenter.tsx`、`IntegrationShell.tsx`、`integration.css`，並更新團隊接入圖。一般建置與型別檢查通過；本機瀏覽器確認面板顯示訪客未驗證、AI 未啟用及 cTrader 未連線。既有 103 項測試本輪未執行：自動核准服務回報用量限制，核准程序未完成。只留本地，未推送或部署。
+
+## 2026-10-25：完整模式先顯示展示登入入口（本地預覽）
+
+本機 `http://127.0.0.1:8765/` 現在先顯示與 Pages 同源的入口，桌面版把「登入／假註冊」放在畫面右側，另有訪客預覽。展示帳號只存在此頁記憶體，登入後進入原本的 FastAPI 工作台，頂部標示「展示帳號 · 未驗證」；訪客標示「訪客預覽 · 未驗證」。可從工作台返回入口，重新整理會清除展示帳號。這不是後端身分驗證、角色或資料隔離。Pages 原有入口仍採原本可展開的帳號體驗。修改 `frontend/src/IntegrationShell.tsx`、`EntryGate.tsx`、`entry-integration.css`。一般建置與前端 103 項測試通過；以純測試資料在本機瀏覽器完成註冊、登入、工作台顯示、返回入口與訪客預覽。只留本地，未推送或部署。
+
+## 2026-10-25：展示登入可見性與 A–E 接入位置（本地預覽）
+
+確認登入沒有被移除：現行 Pages 由 `frontend/src/IntegrationShell.tsx` 在入口掛載 `EntryGate.tsx`，其中「註冊與登入」是 `demoAuth.ts` 的頁面記憶體展示帳號；當時一般 build 直接進 FastAPI 工作台，因正式認證、角色與資料隔離尚未完成。`site/` 原入口仍保留，但不是現行 Pages 建置來源。這次讓 Pages 登入後在頂部標示展示帳號，訪客標示「訪客模擬」；一般模式標示「本機未驗證」，帳號狀態說明區作為日後正式會話與角色的接入位置。沒有建立後端帳號或賦予權限。
+
+新增 [團隊功能接入位置](docs/team-integration-map-20261025.md)，對照 A–E 的現有畫面／程式接點、待定契約與驗收順序；維持既有三頁區域，不以空白假功能卡代替組員內容。修改 `frontend/src/IntegrationShell.tsx`、`frontend/src/integration.css` 與交接文件。前端 103 項測試通過，`npm run build:pages` 與 `npm run build` 通過；瀏覽器以純測試資料完成本地 Pages 註冊、登入並確認「展示帳號」狀態，另確認完整模式顯示「本機未驗證」及正式登入待接說明。修正帳號說明面板被共用頁首遮蓋的層級問題，兩種模式均已目視確認。只留本地，未推送或部署。
+
+## 2026-10-25：公開 Pages 對照與參考行情跨頁引導（本地預覽）
+
+對照目前線上 Pages 與本地版本：線上交易對話仍為舊三欄畫面；本地版已是對話主區、可切換側欄與首屏輸入框，因此這些先前核准的改善尚未發布。本輪檢查三頁後，發現公開「即時看盤」的 TradingView 參考圖缺少顯眼的來源界線與回對話入口。修改 `frontend/src/LivePageGuide.tsx`、`frontend/src/secondaryPages.css`、`frontend/src/App.tsx`：右欄直接說明圖表資料不會自動進入合成回放分析／案例／模擬委託；加入「回交易對話整理想法」，返回後聚焦輸入框；回放案例與下單按鈕明確指出目的地。沒有更動行情、案例排名、帳戶或交易邏輯。
+
+本地瀏覽器確認：新說明可見，返回對話並聚焦輸入框，案例按鈕切至回放頁相似案例分頁。`frontend/tests/desk-pages.test.ts` 更新公開導覽的既有驗收文案；前端 103 項測試、`npm run build:pages` 和 `npm run build` 通過。仍只在本地，未推送或部署。
+
+## 2026-10-25：私有案例資料與完整前後端本地預覽
+
+確認 `GoldDesk_PRIVATE_CASE_DATA_20261023.zip` 是七份 `private/` 案例與行情側檔，沒有後端 Python 程式；後端程式來自團隊 GitHub 專案，公開靜態 Pages 與一般 FastAPI 模式仍是兩種不同入口。先核對 ZIP manifest 的七個 SHA-256，再只把 `private/` 檔案解到本地產品根目錄；`private/` 持續由 Git 忽略，沒有上傳。載入檢查顯示 11,902 筆歷史案例、10,887 份候選市場側檔，候選側檔狀態 `READY`。這不代表合成回放查詢可取得真實盤面相似案例：本地 `/api/cases` 對該查詢回 0 筆與 `QUERY_UNAVAILABLE`，符合來源隔離。
+
+在 `frontend/src/ConversationWorkspace.tsx` 與 `frontend/src/productDesk.css` 增加即時報價未就緒提示和歷史回放入口；本地瀏覽器確認提示可見、入口確實切換到清楚標為合成行情的回放。`backend/tests/test_api.py` 改用私有資料存在時的成熟候選案例檢查 detail 的進場前 K 線，不再假設合成查詢一定有第一筆相似案例；未修改檢索規則或原始資料。一般前端 `npm run build`、公開版 `npm run build:pages`、前端 `tsx --test`（PowerShell 展開檔名）103 項通過。後端 `python -B -X utf8 -m pytest -q backend/tests --basetemp private/pytest_tmp_20261025 --tb=short` 為 449 passed、3 warnings；首次未指定本地暫存目錄時，63 項 fixture 因系統暫存權限錯誤，與程式判斷無關。
+
+本地完整模式啟動於 `http://127.0.0.1:8765/`，僅綁定 `127.0.0.1`。cTrader DEMO 報價與帳戶、Groq 均未連線，未執行真實或 DEMO 下單。改動只留本地，未推送或部署。下一步若要驗收真 DEMO，需由帳戶持有人設定受控憑證並實際連線；公開雲端後端仍需認證、隔離與耐久儲存。
+
 ## 2026-10-25：對話到持倉路徑與可見入口（本地預覽）
 
 新增 [對話到持倉產品路徑](docs/conversation_to_position_plan_20261025.md)，串起提問、依據、草稿、核對、確認、持倉／待成交／紀錄，明確區分公開合成回放與外部參考行情、後續受保護 DEMO。公開對話頁的標題旁新增即時的「黃金模擬持倉 N 筆」入口；點擊切至右側「持倉與帳戶」摘要，再由既有「查看持倉與損益」進入回放頁完整持倉表。修改 `frontend/src/App.tsx`、`frontend/src/integration.css`，不改交易計算、確認或後端。
