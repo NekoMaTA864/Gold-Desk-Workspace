@@ -368,6 +368,19 @@ def assistant_status(request:Request):
         model=os.getenv('GOLD_LLM_MODEL','未設定'),source='ctrader_demo_xauusd',read_only=True),headers={'Cache-Control':'no-store'})
 
 
+@app.get('/api/data/readiness')
+def data_readiness(request:Request):
+    if not _local_broker_access(request):
+        return JSONResponse(status_code=403,content={'detail':'本機資料狀態僅供本機查看'})
+    with engine.lock:
+        engine.cases.ensure_candidate_profiles()
+        return JSONResponse(content=dict(case_source=engine.cases.source,
+            case_count=len(engine.cases.items),
+            candidate_profile_status=engine.cases.candidate_profile_status,
+            replay_market_is_synthetic='合成' in engine.data_source),
+            headers={'Cache-Control':'no-store'})
+
+
 @app.post('/api/assistant/live-chat')
 def live_chat(request:Request,body:LiveChatInput):
     if not _local_broker_access(request):

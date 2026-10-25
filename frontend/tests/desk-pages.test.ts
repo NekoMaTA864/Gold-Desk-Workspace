@@ -37,6 +37,7 @@ test('live guide does not show stale equity or infer empty positions from a miss
 });
 test('public live guide offers replay tools without a private demo order control',()=>{
  const html=renderToStaticMarkup(createElement(LivePageGuide,{...guideProps,publicMode:true}));
- assert.match(html,/查看回放案例/);assert.match(html,/使用模擬下單/);
+ assert.match(html,/回交易對話整理想法/);assert.match(html,/查看回放案例/);assert.match(html,/使用回放模擬下單/);
+ assert.match(html,/圖表資料不會自動帶入對話/);
  assert.doesNotMatch(html,/開啟交易對話與委託|已同步|案例檢索方法/);
 });

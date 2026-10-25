@@ -74,3 +74,18 @@
 .entry-account-preview .entry-login { margin:0 0 22px; max-width:580px; box-shadow:none; }
 .entry-login .entry-form-error,.entry-login .entry-footnote,.entry-login .entry-role-note span,.entry-login .entry-preview-note { font-size:12px; line-height:1.6; }
 .entry-disclaimer { font-size:12px; }
+
+/* The local integration preview opens with the account journey in view. */
+@media(min-width:761px){
+ .entry-page--backend .entry-shell{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,480px);gap:0 48px;align-items:start}
+ .entry-page--backend .entry-brand{grid-column:1/-1}
+ .entry-page--backend .entry-intro{grid-column:1;grid-row:2;margin:84px 0 28px}
+ .entry-page--backend .entry-account-preview{grid-column:2;grid-row:2/span 2;margin:38px 0 0;border:0}
+ .entry-page--backend .entry-options{grid-column:1;grid-row:3;display:block}
+ .entry-page--backend .entry-journey{display:none}
+ .entry-page--backend .entry-disclaimer{grid-column:1/-1}
+}
+.entry-page--backend .entry-account-preview>summary{display:none}
+.entry-page--backend .entry-account-preview .entry-login{max-width:none;margin:0}
+.entry-page--backend .entry-demo{min-height:0}
+@media(max-width:760px){.entry-page--backend .entry-account-preview{margin-top:18px}.entry-page--backend .entry-journey{display:none}}

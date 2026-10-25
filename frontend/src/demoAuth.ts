@@ -1,4 +1,4 @@
-// Frontend-only identity flow for the public demo. Never use this as real authentication.
+// Frontend-only identity flow for Pages and the local preview. Never use this as real authentication.
 export type DemoAccount={username:string;email:string;displayName:string};
 type StoredDemoAccount=DemoAccount&{password:string};
 
