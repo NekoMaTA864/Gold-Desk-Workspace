@@ -21,6 +21,6 @@ export default function PublicTicker(){
     document.head.append(script);
     return()=>{script.remove();target.replaceChildren();};
   },[]);
-  return <div className="public-ticker"><strong>黃金參考價</strong><span ref={host} className="public-ticker-widget"/>
-    <small>{failed?'外部行情暫不可用':'TradingView · OANDA:XAUUSD · 更新依資料供應商'}</small></div>;
+  return <div className="public-ticker"><strong>外部參考價</strong><span ref={host} className="public-ticker-widget"/>
+    <small>{failed?'外部行情暫不可用':'TradingView · OANDA:XAUUSD · 不參與回放成交'}</small></div>;
 }
