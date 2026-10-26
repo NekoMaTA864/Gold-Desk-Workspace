@@ -1,5 +1,11 @@
 # Gold Desk 交接紀錄
 
+## 2026-10-26：過時版型與技能選型文件封存
+
+盤點舊 Markdown 的用途後，保留 `PRODUCT.md` 的產品目的、範圍與限制，以及 API 契約、角色交接、專題報告、資料稽核和相似檢索研究證據。`docs/layout-comparison.md` 描述已移除的舊版型網址參數；`docs/ui-terminal-20261013/skill-assessment.md` 是 10 月 13 日的技能選型與舊 UI 行號，現行程式、Pages、測試和交接均不引用，故從追蹤樹移出。兩份檔案已先封存在 repo 外本機 ZIP，內含 2 個檔案，SHA-256 `48F0E2716C36D19EAC5473A324FC26F91F2E3AA29AAD6BB8D21F3C29F2DE197F`；也可從合併前 commit `f0a117d5c77a558e6ca81e53a3b56204a5b6114d` 還原。更新歷史 README 連結指向固定提交。
+
+這次只刪文件，不改前端、後端或 Pages workflow。已先確認 Pages workflow 只從 `frontend/` 建置，公開站入口與交易對話、即時看盤、歷史回放三頁可開啟；合併後仍須確認 GitHub Actions 與線上網站。下一步若檢視其餘較舊文件，依實際用途與研究追溯價值判斷，不以 GitHub 顯示的「2 days ago」作刪除條件。
+
 ## 2026-10-26：交接文件入口收斂
 
 重寫 `TEAM_HANDOFF.md` 為此 repo 的現行接手入口，修正舊版指向 `kuan35/Gold-Trading-Project` 的 clone 指令，並移除已過時的固定測試數、重複角色提示與 Pages 舊狀態。`docs/team_handoff_20261023/` 的角色文件與部署規格仍供分工使用，已加上歷史版本提示；`HANDOFF.md` 保留逐次變更紀錄，`docs/pages-current-handoff-20261025.md` 保留已部署能力摘要。
