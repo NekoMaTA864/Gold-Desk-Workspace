@@ -1,5 +1,11 @@
 # Gold Desk 交接紀錄
 
+## 2026-10-26：現行 repo 舊版檔案清理
+
+從追蹤樹移出 `.agents/skills/`、`site/`、`prototype/`，合計 426 個檔案、約 7.25 MiB。現行 Pages 仍由 `frontend/` 建置；API、研究、資料契約與部署流程未改。清理前已將這 426 個追蹤檔封存於 repo 外的本機 ZIP，並驗證數量與 SHA-256；詳細原因、清理前 commit 與復原方式見 [清理紀錄](docs/legacy-cleanup-20261026.md)。完整 Git 歷史保留，沒有改寫組員既有的 commit。
+
+驗證：前端 103 項測試通過，`npm run build:pages` 與 `npm run build` 通過；`git -c core.whitespace=cr-at-eol diff --check` 通過。這次沒有修改後端程式，後端完整回歸由 PR 的 Verify workflow 再驗證。下一步是 PR 審查與合併後確認 Pages workflow 成功。舊檔案需要回查時請使用清理紀錄中的固定 commit，不要從舊 README 連到現行樹下不存在的路徑。
+
 ## 2026-10-25：公開 Pages 現況交接與來源文案
 
 新增 [公開 Pages 現況與接手指南](docs/pages-current-handoff-20261025.md)，從 `README.md`、`TEAM_HANDOFF.md` 連入。文件依已部署畫面與現行程式列出入口、交易對話、歷史回放、即時看盤、服務狀態的實際能力及限制；說明 `build:pages`／一般 build、公開資料校驗、乾淨 clone 的重現命令、前端接線範圍、A／C 組需交付的契約、私有資料界線、後續畫面改善與組員交付清單。瀏覽器目視查看公開站的交易對話、即時看盤及歷史回放，三頁版面可用。`frontend/src/PublicTicker.tsx` 將橫幅標為「外部參考價」及「不參與回放成交」，減少與下方合成回放報價混淆；未改資料或交易邏輯。

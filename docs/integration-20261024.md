@@ -1,5 +1,7 @@
 # 2026-10-24 整合交接
 
+> 這是整合當日的紀錄。文中 `site/` 的保留與回復步驟描述當時狀態；舊來源已於 2026-10-26 從現行追蹤樹移出，可由 [清理前提交](https://github.com/NekoMaTA864/Gold-Desk-Workspace/tree/7c1c71931b38d7b443d42f3071c273e3bd429678/site) 取回。目前部署仍以 `frontend/` 為準。
+
 ## 來源與變更
 
 從 kuan35/Gold-Trading-Project 的 eb047caaad2bbd6f544364293c69e17da9dc7421 匯入追蹤的產品程式、API 契約、測試與交接文件。原 site/ 保留，Pages 改由 frontend/ 建置，base 改為 /Gold-Desk-Workspace/。

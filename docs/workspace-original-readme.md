@@ -1,5 +1,7 @@
 # Gold Desk 專題工作區
 
+> 歷史原文。文中 `site/`、`prototype/` 和 `.agents/skills/` 已於 2026-10-26 自現行追蹤樹移出；請從 [清理前提交](https://github.com/NekoMaTA864/Gold-Desk-Workspace/tree/7c1c71931b38d7b443d42f3071c273e3bd429678) 取回舊連結的目標。現行程式和交接以根目錄 README 與 `docs/pages-current-handoff-20261025.md` 為準。
+
 這個資料夾放本機 Python 虛擬環境、前端設計 skills、[五人分工表](docs/Gold%20Desk%20五人分工.md)、E 分工筆記，以及 [可操作的桌面流程原型](prototype/)。團隊正式網站仍以 Gold-Trading-Project repository 為準；此原型是獨立展示稿，沒有修改團隊網站。
 
 三種 Agent 的可行性、責任分界與建議 JSON 見 [Agent 草案](docs/agent-feasibility.md)。這一輪先做桌面流程，手機版暫緩。

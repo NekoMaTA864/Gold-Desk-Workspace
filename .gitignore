@@ -24,3 +24,8 @@ qa/
 artifacts/
 research/artifacts/
 frontend/public/data/
+
+# Archived, non-runtime copies; recover from Git history when needed.
+.agents/skills/
+site/
+prototype/
