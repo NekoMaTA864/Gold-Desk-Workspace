@@ -8,7 +8,7 @@
 
 已另以團隊網站 React／Vite 前端為基底建立 [E 改版網站](site/)。目前以對話與下單前檢查為主，保留回放演練及即時圖表參考；也提供本地展示帳號的註冊、登入流程。來源、預覽步驟與展示限制見 [site README](site/README.md)。
 
-工作台現在同時提供固定版型與自訂大小（拖拉）；組員可由 [GitHub Pages 展示網站](https://nekomata864.github.io/Gold-Desk-Workspace/) 比較，版型入口及回饋問題見 [版型比較](docs/layout-comparison.md)。
+當時工作台提供固定版型與自訂大小（拖拉）；舊版入口及回饋問題見 [版型比較（歷史版本）](https://github.com/NekoMaTA864/Gold-Desk-Workspace/blob/f0a117d5c77a558e6ca81e53a3b56204a5b6114d/docs/layout-comparison.md)。現行 Pages 版面請以實際網站與目前前端程式為準。
 
 同步 repository：[NekoMaTA864/Gold-Desk-Workspace](https://github.com/NekoMaTA864/Gold-Desk-Workspace)（公開）。這個 repository 供家裡與公司同步專題工作區內容，與團隊的網站程式 repository 分開。請勿提交真實密碼、金鑰或私人交易資料。
 
