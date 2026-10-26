@@ -16,7 +16,7 @@
 
 ## 二、哪一份程式會被發布
 
-- 此倉庫的 `frontend/` 是現行前端；`frontend/src/main.tsx` 掛載 `IntegrationShell.tsx`。`site/` 是保留的舊入口，**不是**現行 Pages 建置來源。
+- 此倉庫的 `frontend/` 是現行前端；`frontend/src/main.tsx` 掛載 `IntegrationShell.tsx`。舊 `site/` 已從目前追蹤樹移出，來源可由 [清理前提交](https://github.com/NekoMaTA864/Gold-Desk-Workspace/tree/7c1c71931b38d7b443d42f3071c273e3bd429678/site) 取回；它**不是**現行 Pages 建置來源。
 - `.github/workflows/pages.yml` 在 `main` 推送後，下載並核對 `scripts/public-data-manifest.json` 鎖定的三份已公開資料，跑前端測試，執行 `npm run build:pages`，發布 `frontend/dist-pages/`。PR 另由 `.github/workflows/verify.yml` 跑前後端測試及兩種前端建置。
 - `build:pages` 使用瀏覽器展示引擎；一般 `npm run build` 搭配本機 FastAPI。兩種建置的能力不同。GitHub Pages 不執行 Python，也沒有本機 `private/`、券商憑證或持久帳戶資料。
 - 團隊參考實作在 `kuan35/Gold-Trading-Project`；本站目前不是自動追蹤該倉庫新提交。移植組員改動時，先核對共同 commit、來源與授權，再走此倉庫 PR。
