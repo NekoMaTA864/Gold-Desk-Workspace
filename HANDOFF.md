@@ -1,5 +1,11 @@
 # Gold Desk 交接紀錄
 
+## 2026-10-26：交接文件入口收斂
+
+重寫 `TEAM_HANDOFF.md` 為此 repo 的現行接手入口，修正舊版指向 `kuan35/Gold-Trading-Project` 的 clone 指令，並移除已過時的固定測試數、重複角色提示與 Pages 舊狀態。`docs/team_handoff_20261023/` 的角色文件與部署規格仍供分工使用，已加上歷史版本提示；`HANDOFF.md` 保留逐次變更紀錄，`docs/pages-current-handoff-20261025.md` 保留已部署能力摘要。
+
+`E-前端改善筆記.md` 以 2026-10-01 程式與已過時的時程撰寫，不再作為現行待辦，故從追蹤樹移出；清理前在 repo 外本機封存同 SHA-256 的副本，亦可由 Git 歷史取得。它提出的資料來源、人工確認與錯誤狀態原則，仍由現行 API 契約、前端角色文件及 Pages 現況指南承接。這次僅改文件，不改程式與資料；驗證為 Git diff 空白檢查、連結與路徑核對及 CI。下一步由組員按現行入口接手。
+
 ## 2026-10-26：現行 repo 舊版檔案清理
 
 從追蹤樹移出 `.agents/skills/`、`site/`、`prototype/`，合計 426 個檔案、約 7.25 MiB。現行 Pages 仍由 `frontend/` 建置；API、研究、資料契約與部署流程未改。清理前已將這 426 個追蹤檔封存於 repo 外的本機 ZIP，並驗證數量與 SHA-256；詳細原因、清理前 commit 與復原方式見 [清理紀錄](docs/legacy-cleanup-20261026.md)。完整 Git 歷史保留，沒有改寫組員既有的 commit。

@@ -1,5 +1,7 @@
 # Gold Desk：前後端 Codex 共同交接入口
 
+> 本文是 2026-10-23 的原始交接。現行 clone 來源、Pages 能力與接手順序請先看根目錄 [TEAM_HANDOFF.md](../../TEAM_HANDOFF.md) 和 [公開 Pages 現況](../pages-current-handoff-20261025.md)；下方的舊路徑、舊版本描述不可直接當作現況。
+
 2026-10-23。此文件以目前相似案例檢索主線為準，舊D分工不構成新增需求。交接狀態：本機功能可展示；獨立盲評、多人隔離與雲端部署由下一階段接手。這份文件不是已完成部署的聲明。
 
 最新交接推送入口：[TEAM_HANDOFF.md](../../TEAM_HANDOFF.md)，含兩位Codex可直接貼上的任務。架站次序見[DEPLOYMENT.md](DEPLOYMENT.md)。公開repo根目錄即產品根目錄；文件中的product/是原工作區外層，在clone後請省略。
