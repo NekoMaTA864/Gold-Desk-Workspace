@@ -47,4 +47,4 @@ Google Stitch 相關流程需要另接 Stitch 服務，本次未下載。以上 
 
 ## 建議使用順序
 
-Gold Desk E 分工優先用 `ui-ux-pro-max` 定視覺系統、`composition-patterns` 拆共用元件、`web-design-guidelines` 檢查完成的畫面。現有畫面需要精修時再使用 `impeccable`。詳細工作順序見 [E 前端改善筆記](E-前端改善筆記.md)。
+Gold Desk E 分工優先用 `ui-ux-pro-max` 定視覺系統、`composition-patterns` 拆共用元件、`web-design-guidelines` 檢查完成的畫面。現有畫面需要精修時再使用 `impeccable`。當時的詳細工作順序見 [E 前端改善筆記（歷史版本）](https://github.com/NekoMaTA864/Gold-Desk-Workspace/blob/5463d6c8af98e0a8596738d26b19b65bdbd885e8/E-%E5%89%8D%E7%AB%AF%E6%94%B9%E5%96%84%E7%AD%86%E8%A8%98.md)。
