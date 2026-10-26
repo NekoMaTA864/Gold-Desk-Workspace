@@ -40,6 +40,8 @@
 .pd-public.pd-view-assistant .topbar,.pd-public.pd-view-replay .topbar,.pd-public.pd-view-assistant .assistant-titlebar{display:none}
 .pd-public-header-actions{display:flex;align-items:center;gap:8px}
 .pd-public-header-actions button{min-height:36px}
+.instrument-header h2{font-size:22px;line-height:normal;letter-spacing:.025em;font-weight:650}
+.instrument-header h2 span{font-size:12px;letter-spacing:0;margin-left:8px;color:var(--muted);font-weight:400}
 @media(min-width:941px){
  .pd-public.pd-route-secondary .pd-market{min-height:60px;padding:8px 24px}
  .pd-public.pd-route-secondary .pd-symbol{font-size:17px}
@@ -47,7 +49,6 @@
  .pd-public.pd-route-secondary .pd-page-heading{padding:14px 24px 10px}
  .pd-public.pd-route-secondary .pd-page-heading h1{font-size:22px}
  .pd-public.pd-route-secondary .pd-page-heading p{font-size:12px;margin-top:3px}
- .pd-public.pd-route-secondary .pd-page-outline button:hover,.pd-public.pd-route-secondary .pd-page-outline button:focus-visible{background:var(--raised);color:var(--ink)}
  .pd-public.pd-route-secondary #market-workspace{scroll-margin-top:75px}
 }
 .pd-public.pd-view-assistant .assistant-workspace{max-width:none;margin:0;padding:10px 24px 24px}
@@ -74,6 +75,7 @@
  .pd-public.pd-view-assistant .assistant-context{order:2}
 }
 @media(max-width:740px){.pd-public.pd-view-assistant .assistant-workspace{padding:8px 12px 18px}}
+@media(max-width:740px){.pd-route-secondary .instrument-header h2{font-size:18px}.pd-route-secondary .instrument-header h2 span{display:block;font-size:11px;margin-top:4px}}
 @media(max-width:760px){.integration-bar{align-items:flex-start;flex-direction:column;padding:10px 14px;gap:6px}.integration-tools{flex-wrap:wrap}.integration-source{right:14px}.connection-center{padding:20px 14px}.connection-center-heading{flex-direction:column}.connection-center-row{grid-template-columns:1fr;gap:7px}.connection-center-state{justify-self:start;text-align:left}.entry-page{padding:20px!important}.entry-page .entry-options{grid-template-columns:1fr}.entry-page .entry-intro{margin:36px 0 24px}.first-use-guide{margin:12px;flex-wrap:wrap}.guide-actions{width:100%}.integrated-risk .risk-grid{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){.entry-page *,.integration-bar *{animation:none!important;transition:none!important}}
 

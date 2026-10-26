@@ -6,7 +6,7 @@ import DeskRouteFrame from '../src/DeskRouteFrame';
 import LivePageGuide from '../src/LivePageGuide';
 import type {DemoMarket} from '../src/demoMarket';
 
-const render=(view:'assistant'|'live'|'replay',publicMode=false,busy=false)=>renderToStaticMarkup(createElement(DeskRouteFrame,{view,market:null,light:false,publicMode,busy,onNavigate:()=>{},onSection:()=>{},onToggleTheme:()=>{},children:createElement('main',null,'page content')}));
+const render=(view:'assistant'|'live'|'replay',publicMode=false,busy=false)=>renderToStaticMarkup(createElement(DeskRouteFrame,{view,market:null,light:false,publicMode,busy,onNavigate:()=>{},onToggleTheme:()=>{},children:createElement('main',null,'page content')}));
 test('secondary pages expose the same navigation with the actual selected page',()=>{
  const html=render('live');
  assert.match(html,/aria-current="page"[^>]*>.*即時看盤/);
@@ -20,7 +20,14 @@ test('public page shell keeps demo account capability unavailable',()=>{
 });
 test('locked replay work cannot navigate through a second unlocked navigation',()=>{
  const html=render('replay',false,true);
- assert.equal((html.match(/disabled=""/g)||[]).length,6);
+ assert.equal((html.match(/disabled=""/g)||[]).length,3);
+});
+test('public rail stays focused on three workspaces',()=>{
+ for(const view of ['assistant','live','replay'] as const){
+  const html=render(view,true);
+  assert.match(html,/工作台頁面/);
+  assert.doesNotMatch(html,/本頁內容|pd-page-outline/);
+ }
 });
 test('assistant retains the route body container without duplicated navigation or header',()=>{
  const html=render('assistant');

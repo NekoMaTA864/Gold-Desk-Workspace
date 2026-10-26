@@ -11,6 +11,6 @@ export default function ReplayAccountSummary({state,onPositions,onHistory,onClos
   {positions.slice(0,3).map(p=><div key={p.id} className="replay-position-line"><span>{p.side==='BUY'?'買進':'賣出'} {p.lot} 手 · 進場 {p.entry}</span><b className={p.pnl.startsWith('-')?'negative':'positive'}>{p.pnl} USD</b>{onClose&&<button disabled={busy||state?.mode!=='replay'} onClick={()=>onClose(p.id)} aria-label={`平倉本機部位 ${p.id}`}>平倉</button>}</div>)}
   {!positions.length&&<p>目前沒有本機回放持倉。</p>}
   {positions.length>3&&<p className="fine">另有 {positions.length-3} 筆，點下方查看全部。</p>}
-  <div className="replay-account-links"><button onClick={onPositions}>查看持倉與損益</button><button onClick={onHistory}>下單與成交紀錄</button></div>
+  <div className="replay-account-links"><button onClick={onPositions}>到回放頁看持倉與損益</button><button onClick={onHistory}>到回放頁看下單紀錄</button></div>
  </div>;
 }

@@ -1,5 +1,23 @@
 # Gold Desk 交接紀錄
 
+## 2026-10-26：左側目錄收斂為三個主頁（本地預覽，尚未部署）
+
+實際檢視三頁後，判斷「本頁內容」與各頁現有的側欄、按鈕及分頁重複，故從左側移除。左側保留交易對話、即時看盤、歷史回放三個主頁入口與底部公開展示來源說明；對話頁的帳戶／草稿切換、即時看盤的下一步按鈕、回放頁的持倉與案例分頁仍在原位。清除 `DeskRouteFrame.tsx`、`App.tsx` 中僅供該區塊使用的事件與型別，以及相應 CSS；沒有改資料或交易流程。前一節記錄的是此輪前的中間本地版本，以本節的三頁目錄為準。
+
+修改 `frontend/src/DeskRouteFrame.tsx`、`App.tsx`、`integration.css`、`secondaryPages.css`、`frontend/tests/desk-pages.test.ts`。前端 104 項測試、`npm run build:pages`、`npm run build` 及 Git diff 空白檢查通過；本地瀏覽器目視確認交易對話、即時看盤、歷史回放的左側目錄與版面。預覽仍在 `http://127.0.0.1:5175/Gold-Desk-Workspace/`。沒有推送或部署。
+
+## 2026-10-26：左側本頁導覽語意一致（本地預覽，尚未部署）
+
+公開版原「快速前往」混合本頁定位與直接切換至歷史回放；即時看盤與交易對話尤其容易誤判點擊結果。改為「本頁內容」，只列所在頁面可到達的區塊：交易對話為對話輸入、帳戶與提醒、委託草稿；即時看盤為參考行情圖、行情說明與下一步；歷史回放為回放 K 線、模擬委託、持倉與紀錄、相似歷史案例。跨頁仍由三個主頁選單及內容區明確標示的按鈕負責；對話帳戶區的持倉、紀錄、案例及提醒按鈕也直接標出「到回放頁」。同步修正即時看盤頁說明，避免暗示此頁直接展示歷史案例。
+
+修改 `frontend/src/DeskRouteFrame.tsx`、`App.tsx`、`ReplayAccountSummary.tsx`、`integration.css`、`secondaryPages.css`、`frontend/tests/desk-pages.test.ts`、`replay-account.test.ts`。前端 104 項測試、`npm run build:pages`、`npm run build` 通過；最後文字調整後再次執行 104 項測試與 Pages 建置。瀏覽器確認對話頁委託草稿顯示於同頁側欄、即時看盤說明停留同頁、歷史回放案例切換同頁分頁，最後也目視核對即時看盤頁說明與對話帳戶區跨頁按鈕。沒有推送或部署。
+
+## 2026-10-26：公開 Pages 細節修整（本地預覽，尚未部署）
+
+對照現行公開 Pages 與本地三頁後，保留左側目錄、共用頁首、三欄工作區、登入入口與原有操作流程。本輪只修正容易誤解的介面細節：公開交易對話的建議問題與輸入提示改稱「回放行情」，避免使用者以為助手會直接讀取 TradingView 外部即時價；即時看盤的側欄小標改為「行情脈絡」；入口的帳號體驗展開後顯示「收合帳號體驗」。即時看盤及歷史回放各保留一個頁面主標題，商品名稱改為次標題，視覺大小不變。
+
+修改 `frontend/src/App.tsx`、`EntryGate.tsx`、`LiveChart.tsx`、`LivePageGuide.tsx`、`entry-integration.css`、`integration.css`。前端 103 項測試、`npm run build:pages`、`npm run build` 與 Git diff 空白檢查均通過。本地 Pages 預覽已目視檢查入口、帳號展開狀態、交易對話、即時看盤、歷史回放，三頁版面正常；預覽網址為 `http://127.0.0.1:5175/Gold-Desk-Workspace/`。這次沒有改資料來源、模擬交易、API 或身分驗證，沒有推送或部署；若決定發布，再走審查與線上驗收。
+
 ## 2026-10-26：過時版型與技能選型文件封存
 
 盤點舊 Markdown 的用途後，保留 `PRODUCT.md` 的產品目的、範圍與限制，以及 API 契約、角色交接、專題報告、資料稽核和相似檢索研究證據。`docs/layout-comparison.md` 描述已移除的舊版型網址參數；`docs/ui-terminal-20261013/skill-assessment.md` 是 10 月 13 日的技能選型與舊 UI 行號，現行程式、Pages、測試和交接均不引用，故從追蹤樹移出。兩份檔案已先封存在 repo 外本機 ZIP，內含 2 個檔案，SHA-256 `48F0E2716C36D19EAC5473A324FC26F91F2E3AA29AAD6BB8D21F3C29F2DE197F`；也可從合併前 commit `f0a117d5c77a558e6ca81e53a3b56204a5b6114d` 還原。更新歷史 README 連結指向固定提交。
