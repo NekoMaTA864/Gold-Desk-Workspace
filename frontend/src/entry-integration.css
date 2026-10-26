@@ -67,9 +67,12 @@
 .entry-journey p { color:var(--muted); margin:0; font-size:13px; line-height:1.6; }
 .entry-account-preview { margin-top:25px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
 .entry-account-preview>summary { display:flex; gap:12px; justify-content:space-between; align-items:center; padding:17px 0; cursor:pointer; color:var(--muted); font-size:13px; list-style:none; }
-.entry-account-preview>summary span:last-child { color:var(--primary); }
-.entry-account-preview>summary span:last-child::after { content:' ＋'; }
-.entry-account-preview[open]>summary span:last-child::after { content:' −'; }
+.entry-account-preview>summary>.entry-account-action { color:var(--primary); }
+.entry-account-preview>summary>.entry-account-action::after { content:' ＋'; }
+.entry-account-preview[open]>summary>.entry-account-action::after { content:' −'; }
+.entry-account-preview .entry-account-action .when-open { display:none; }
+.entry-account-preview[open] .entry-account-action .when-open { display:inline; }
+.entry-account-preview[open] .entry-account-action .when-closed { display:none; }
 .entry-account-preview>summary::-webkit-details-marker { display:none; }
 .entry-account-preview .entry-login { margin:0 0 22px; max-width:580px; box-shadow:none; }
 .entry-login .entry-form-error,.entry-login .entry-footnote,.entry-login .entry-role-note span,.entry-login .entry-preview-note { font-size:12px; line-height:1.6; }
