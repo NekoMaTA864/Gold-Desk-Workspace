@@ -1,5 +1,6 @@
 import {useEffect,useState} from 'react';
 import {api} from './api';
+import {openBackendEvents} from './backendTransport';
 import type {DemoBars} from './demoMarket';
 import type {LiveChartFrame} from './liveCandles';
 
@@ -18,7 +19,7 @@ export function useLiveCandles(interval:'5m'|'15m'|'1h'){
   const connect=()=>{
    events?.close();events=null;
    if(document.hidden){setFrame(old=>old?{...old,status:'STALE',forming:null}:null);return;}
-   events=new EventSource(`/api/broker/chart-stream?interval=${interval}`);
+   events=openBackendEvents(`/broker/chart-stream?interval=${interval}`);
    events.onmessage=event=>{if(!active)return;try{
     const data=JSON.parse(event.data) as LiveChartFrame;
     if(data.interval!==interval||!Array.isArray(data.bars))return;

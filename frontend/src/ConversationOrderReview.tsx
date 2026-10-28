@@ -1,4 +1,4 @@
-import {RiskReview} from './IntegratedReview';
+import BrokerReviewContents from './BrokerReviewContents';
 import {useEffect,useRef,useState} from 'react';
 import {api,key} from './api';import type {Draft} from './types';import type {MarketReply} from './LiveAssistant';import {CloseConfirmError,confirmBrokerClose} from './BrokerClosePanel';import {submissionLocked} from './conversationState';
 export type CheckedOrder=Draft&{expires_at_utc:string;analysis_reply:MarketReply;analysis_snapshot_id:string;analysis_as_of_utc:string};
@@ -23,7 +23,7 @@ export default function ConversationOrderReview({draft,checkedRevision,currentRe
  };
  return <section className="cw-review" aria-label="最新 DEMO 委託核對"><h3>{result?'委託回報':'確認前核對'}</h3>
   <p><strong>{draft.side==='BUY'?'做多':'做空'} {draft.lot} 手 · {draft.order_type==='LIMIT'?'限價':'市價'}</strong></p><p>參考價 {draft.price} · SL {draft.sl??'未設定'} · TP {draft.tp??'未設定'}</p>
- <RiskReview draft={draft}/>
+ <BrokerReviewContents draft={draft}/>
   {!result&&<p className="fine">{expired?'草稿已過期，請重新檢查':`有效至 ${new Date(draft.expires_at_utc).toLocaleTimeString('zh-TW',{hour12:false})}，確認時後端再次核對。`}</p>}
   {result&&<p role="status"><strong>{label(result.status)}</strong>{result.execution_price&&` · 成交價 ${result.execution_price}`}</p>}{error&&<p role="alert">{error}</p>}
   <div className="cw-actions">{!result&&<button type="button" className="primary" disabled={busy||expired||currentRevision!==checkedRevision} onClick={()=>void confirm()}>確認送出 DEMO 委託</button>}<button type="button" disabled={busy||locked} onClick={()=>void cancel()}>{result?'完成':'取消草稿'}</button>{result&&<button type="button" onClick={onHistory}>查看持倉與紀錄</button>}</div>

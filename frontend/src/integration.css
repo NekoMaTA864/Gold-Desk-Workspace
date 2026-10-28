@@ -126,3 +126,29 @@
  .pd-public.pd-view-assistant .assistant-conversation .chat-message{max-width:72ch}
  .pd-public.pd-view-assistant .assistant-conversation .chat-message p{font-size:14px;line-height:1.75}
 }
+.vol-range{min-width:0;margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--raised);font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.vol-range h4{margin:0 0 8px;font-size:16px}
+.vol-range p{margin:8px 0}
+.vol-range .vol-source{font-size:13px}
+.vol-range summary{cursor:pointer;padding:8px 0;line-height:1.6}
+.vol-table{width:100%;table-layout:fixed;border-collapse:collapse;margin:10px 0;font-size:14px}
+.vol-table th,.vol-table td{white-space:normal;overflow-wrap:anywhere;padding:10px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.vol-range .fine{font-size:13px;line-height:1.7}
+.vol-stop,.vol-budget{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.vol-budget label{display:block;margin-bottom:6px}
+.vol-budget input{box-sizing:border-box;width:min(100%,240px);min-height:40px;font:inherit}
+@media(max-width:480px){.vol-range{padding:12px}.vol-table th,.vol-table td{padding:8px 4px;font-size:13px}}
+.review-sections>section{min-width:0;margin:18px 0;padding-top:14px;border-top:1px solid var(--line);overflow-wrap:anywhere}
+.review-sections>section>h3{font-size:16px;line-height:1.5;margin:0 0 10px;color:var(--primary)}
+.review-unavailable{padding:12px;border:1px solid var(--line);border-radius:8px;font-size:14px;line-height:1.7}
+.broker-review-contents{min-width:0;font-size:14px;line-height:1.7}
+.broker-review-contents details{min-width:0;margin:8px 0}
+.broker-review-contents summary{cursor:pointer;line-height:1.6}
+.broker-review-contents table{width:100%;table-layout:fixed}
+.broker-review-contents th,.broker-review-contents td{white-space:normal;overflow-wrap:anywhere}
+.team-verification{margin:16px 0;padding:14px;border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.7;overflow-wrap:anywhere;min-width:0}
+.team-verification summary{cursor:pointer;padding:6px 0;font-weight:600}
+.team-verification li{margin:10px 0}
+.team-verification li p{margin:4px 0}
+.team-verification ol,.team-verification ul{padding-left:22px}
+.team-verification details{margin-top:10px}

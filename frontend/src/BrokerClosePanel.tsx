@@ -1,6 +1,7 @@
 import {useEffect,useId,useRef,useState} from 'react';
 import Decimal from 'decimal.js';
 import {api,key} from './api';
+import {BackendError,requestBackendJSON} from './backendTransport';
 import type {DemoMarket} from './demoMarket';
 
 type CloseDraft={id:string;revision:number;status:string;intent:'CLOSE';position_id:string;
@@ -12,15 +13,11 @@ export class CloseConfirmError extends Error{
   constructor(message:string,public readonly safeRejected:boolean){super(message);this.name='CloseConfirmError';}
 }
 export async function confirmBrokerClose(id:string,revision:number,idempotencyKey:string):Promise<CloseResult>{
-  // Preserve explicit server rejection status; api() exposes only a plain Error.
-  const response=await fetch(`/api/broker/drafts/${encodeURIComponent(id)}/confirm`,{
-    method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision,idempotency_key:idempotencyKey})});
-  const content:unknown=await response.json().catch(()=>null);
-  if(!response.ok){
-    const detail=content&&typeof content==='object'&&'detail' in content&&typeof content.detail==='string'?content.detail:null;
-    const explicit=[400,401,403,404,405,409,410,415,422,429].includes(response.status)&&Boolean(detail)&&
-      Boolean(response.headers.get('content-type')?.includes('application/json'));
-    throw new CloseConfirmError(detail??'無法確認券商是否收到平倉；請核對帳戶，勿重送。',explicit);
+  let content:unknown;
+  try{content=await requestBackendJSON<unknown>(`/broker/drafts/${encodeURIComponent(id)}/confirm`,{revision,idempotency_key:idempotencyKey});}
+  catch(error){
+    const explicit=error instanceof BackendError&&error.status!==null&&[400,401,403,404,405,409,410,415,422,429].includes(error.status)&&Boolean(error.detail)&&error.jsonResponse;
+    throw new CloseConfirmError(error instanceof Error?error.message:'無法確認券商是否收到平倉；請核對帳戶，勿重送。',explicit);
   }
   if(!content||typeof content!=='object'||!('status' in content)||typeof content.status!=='string')
     throw new CloseConfirmError('平倉回報格式無效；請核對帳戶，勿重送。',false);

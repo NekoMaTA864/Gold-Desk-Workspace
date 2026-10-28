@@ -22,7 +22,7 @@ export default function CaseComparison({comparison:c,snapshotId,hideCharts=false
   <header><strong>{c.label}</strong><span>{c.side} · 情境規則</span></header><p>{c.reason}</p>
   <p className="fine">合格觀察列 {c.counts.eligible??'未知'} · 通過操作群 {c.counts.passed??'未知'} · 展示 {c.counts.displayed} 組。已收棒截止：{utc(c.query_as_of_utc)}</p>
   {!!c.rejections.length&&<><ul>{c.rejections.map(r=><li key={r.key}>{r.label}：{r.count} 列</li>)}</ul><p className="fine">一列可有多個未通過原因，不能相加當作案例總數。</p></>}
-  {c.cases.map(item=><details key={item.ref}><summary>{item.ref} · {item.event} · 末段{item.tail_direction}</summary><p className="fine">{item.similarities.join('；')}</p>
+  {c.cases.map(item=><details key={item.ref}><summary>{item.ref} · {item.event} · 末段{item.tail_direction}</summary><p className="fine">相同條件：{item.similarities.length?item.similarities.join('；'):'未提供'}</p><p className="fine">不同條件：{item.differences.length?item.differences.join('；'):'未提供'}</p>
    <table><caption className="sr-only">{item.ref}逐項比較</caption><thead><tr><th>比較項目</th><th>實際差距</th><th>試驗容忍</th><th>結果</th></tr></thead><tbody>{item.metrics.map(m=><tr key={m.key}><th scope="row">{m.label}</th><td>{m.actual===null?'資料不足':m.actual+m.unit}</td><td>{m.tolerance===null?'資料不足':m.tolerance+m.unit}</td><td>{m.passed===null?'資料不足':m.passed?'符合':'需核對'}</td></tr>)}</tbody></table><CaseOperations snapshotId={snapshotId} caseRef={item.ref}/></details>)}
   {!hideCharts&&!!c.cases.length&&snapshotId&&<button type="button" disabled={busy} onClick={()=>void load()}>{busy?'讀取固定快照…':opened?'收合 K 線':'對照同一快照 K 線'}</button>}
   {error&&<p role="alert" className="modal-error">{error}</p>}

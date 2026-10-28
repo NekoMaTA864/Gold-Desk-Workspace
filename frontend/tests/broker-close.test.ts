@@ -65,7 +65,7 @@ test('typed close confirm distinguishes explicit validation rejection from uncer
     }
     let calls=0;
     globalThis.fetch=async()=>{calls++;throw new TypeError('network unavailable');};
-    await assert.rejects(confirmBrokerClose('one',1,'stable-key'),/network unavailable/);
+    await assert.rejects(confirmBrokerClose('one',1,'stable-key'),error=>error instanceof CloseConfirmError&&!error.safeRejected&&error.message.includes('勿重送'));
     assert.equal(calls,1);
   }finally{globalThis.fetch=original;}
 });

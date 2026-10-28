@@ -1,5 +1,6 @@
 import type {ReactNode} from 'react';
 import {useEffect,useRef,useState,type FormEvent,type CSSProperties} from 'react';
+import {requestBackendJSON} from './backendTransport';
 import {api} from './api';import type {Side} from './types';import type {DemoMarket} from './demoMarket';import type {MarketReply} from './LiveAssistant';
 import ConversationResize from './ConversationResize';import {CHAT_HEIGHT_KEY,savedChatHeight} from './chatSize';
 import ConversationHelp from './ConversationHelp';import {nearChatBottom,turnScrollTarget} from './conversationScroll';
@@ -47,7 +48,7 @@ export default function ConversationWorkspace({market,light,visible,onHistory,on
   if(working.current||!question.trim())return;working.current=true;setBusy(true);setError('');setText('');
   const id=++sequence.current,sentRevision=revisionRef.current;setTurns(v=>[...v,{id,question}]);
   const controller=new AbortController();request.current=controller;const timeout=window.setTimeout(()=>controller.abort(),60000);
-  const post=async<T,>(path:string,body:unknown):Promise<T>=>{const r=await fetch('/api'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});const v=await r.json().catch(()=>null);if(!r.ok||v===null)throw Error(typeof v?.detail==='string'?v.detail:'盤面服務暫時無法回覆，請稍後再試。');return v;};
+  const post=async<T,>(path:string,body:unknown):Promise<T>=>{const v=await requestBackendJSON<T>(path,body,{signal:controller.signal});if(v===null)throw Error('盤面服務未提供有效結果，請稍後再試。');return v;};
   try{
    const interpretation=await post<Interpretation>('/assistant/interpret',{message:question,draft:inputRef.current,analysis_side:forcedSide??sideRef.current,input_revision:sentRevision});
    const stale=!acceptRevision(interpretation.input_revision,revisionRef.current);
