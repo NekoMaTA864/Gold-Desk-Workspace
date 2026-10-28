@@ -41,6 +41,7 @@ export function changeRules(rules:PersonalRule[],proposal:RuleProposal):Personal
 }
 const RULE_INTENT=/規則|提醒|警告|通知|以後|每次|超過|上限|暫停|啟用|停用|刪除|如果|假如|假設|若|不要\s*(?:買|賣|下單|加倉|開倉|平倉)|別買|別賣|不買|不賣|取消|不用|第\s*\d+\s*條/;
 export function parseRuleMessage(message:string,rules:PersonalRule[]):RuleReply|null{
+ if(!/規則|提醒|警告|通知|以後|每次|上限|第\s*\d+\s*條/.test(message))return null;
  if(!RULE_INTENT.test(message))return null;
  const help='請用「我的規則」選擇條件與門檻，或輸入「單筆超過0.1手提醒我」。設定／假設語句不會建立訂單。';
  if(/列出|查看|有哪些|我的規則/.test(message)&&!/[改刪增]/.test(message))return {message:rules.length?rules.map((r,i)=>`${i+1}. ${r.enabled?'生效':'暫停'}：${ruleText(r)}`).join('\n'):'目前沒有個人規則。'+help};

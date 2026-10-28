@@ -83,3 +83,13 @@ html{scrollbar-gutter:stable}
 
 .assistant-help-link{font-size:12px;padding:5px 9px;margin-left:8px;color:var(--primary);background:transparent;border:1px solid var(--line);border-radius:6px}.workspace-info-content>.assistant-help-link{margin:0 0 18px;font-size:14px}
 .assistant-principles ol{padding-left:22px}.assistant-principles li{padding:10px 0;border-bottom:1px solid var(--line)}.assistant-principles li strong{font-size:15px}.assistant-principles li p{margin:6px 0}.assistant-principles-mode{padding:12px;background:var(--raised);border-radius:8px}.assistant-principles details{margin-top:16px;border:1px solid var(--line);padding:12px;border-radius:8px}.assistant-principles summary{cursor:pointer}
+/* Every flex ancestor must shrink, otherwise long transcripts escape the fixed card. */
+.pd-public.pd-view-assistant .assistant-conversation{overflow:hidden;display:flex;flex-direction:column}
+.pd-public.pd-view-assistant .assistant-conversation .assistant-card-heading{flex:0 0 auto}
+.pd-public.pd-view-assistant .assistant-conversation .assistant-source-panel{flex:1 1 0;min-height:0;overflow:hidden}
+.pd-public.pd-view-assistant .assistant-conversation .chat-panel{flex:1 1 0;min-height:0;height:auto;overflow:hidden;display:flex;flex-direction:column}
+.pd-public.pd-view-assistant .assistant-conversation .chat-log{flex:1 1 0;min-height:0;height:0;overflow-y:scroll;overscroll-behavior-y:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:var(--primary) var(--surface)}
+.pd-public.pd-view-assistant .assistant-conversation .chat-message{flex:0 0 auto}
+.pd-public.pd-view-assistant .assistant-conversation .chat-input,.pd-public.pd-view-assistant .assistant-conversation .provider-label,.pd-public.pd-view-assistant .assistant-conversation .chat-latest{flex:0 0 auto}
+.chat-latest{align-self:center;margin:4px 0;font-size:13px}
+@media(max-width:999px){.pd-public.pd-view-assistant .assistant-conversation{height:clamp(420px,75dvh,760px);min-height:0}}
