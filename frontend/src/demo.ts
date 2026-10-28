@@ -1,5 +1,6 @@
 /** Public Pages sandbox: synthetic replay and explicitly released real case archive. */
 import Decimal from 'decimal.js';
+import {parseDemoTrade} from './demoChatIntent';
 import {validateRules,evaluateRules,parseRuleMessage,type PersonalRule} from './personalRules';
 import {tradeChart} from './tradeChart';
 import fixtures from './demo-data.json';
@@ -160,13 +161,15 @@ export class DemoEngine {
   groups:Object.entries(labels).map(([code,label])=>({code,label,count:this.cases.filter(c=>c.behavior===code).length,description:'合成示範分類，用於展示介面'})),limitations:['GitHub Pages 不包含私人交易員紀錄','本機新版資料稽核的匿名彙總另見 GitHub docs/data-audit-summary.md']};}
  chat(message:string,side?:Side,typical_lot?:string|null){
   if(parseRuleMessage(message,[]))return {message:'這是設定、假設或取消語句；請在我的規則中設定，不會建立訂單。',draft:null,provider:'local_rules'};
-  const requested=/賣|做空|\bSELL\b/i.test(message)?'SELL':/買|做多|\bBUY\b/i.test(message)?'BUY':message.includes('改')?side:null;
-  const lot=message.match(/(\d+(?:\.\d+)?)\s*(?:手|lots?\b)/i);
-  if(requested&&lot&&!/不要|別|不買|不賣|取消|不用/.test(message)){
-   const draft=this.draft(requested,lot[1],message.match(/停損\s*([0-9]+(?:\.[0-9]+)?)/)?.[1],message.match(/停利\s*([0-9]+(?:\.[0-9]+)?)/)?.[1],typical_lot);
-   return {message:'已準備'+draft.lot+'手草稿，尚未成交。這是本地規則解析，請核對案例與風險後自行確認。',draft,provider:'local_rules'};
+  const parsed=parseDemoTrade(message);
+  if(parsed?.kind==='reply')return {message:parsed.message,draft:null,provider:'local_rules'};
+  if(parsed?.kind==='draft'){
+   const draft=this.draft(parsed.side,parsed.lot,parsed.sl,parsed.tp,typical_lot);
+   return {message:`已準備${draft.side==='BUY'?'買進':'賣出'} ${draft.lot} 手的市價草稿，尚未成交。請核對五區資料，再決定確認或取消。`,draft,provider:'local_rules'};
   }
-  const m=this.state().market;return {message:`本地助手：目前合成回放最近60根5分K變化 ${m.change_pct}%，區間 ${m.low} 至 ${m.high}；這是數值描述，不是買賣建議。可以輸入「買進黃金0.1手」準備待確認草稿。`,draft:null,provider:'local_rules'};
+  if(/持倉|部位/.test(message))return {message:`目前本機回放有 ${this.positions.length} 筆持倉，並非 cTrader 帳戶。可在「持倉與帳戶」查看明細；聊天不會平倉。`,draft:null,provider:'local_rules'};
+  if(/手數|Lot|盎司/i.test(message))return {message:'本機展示以1手＝100盎司試算，0.10手＝10盎司；手數是數量，不是願意虧損的金額。正式交易須核對券商商品規格。',draft:null,provider:'local_rules'};
+  const m=this.state().market;return {message:`目前是基本規則助手，未連接 Groq。合成回放最近60根5分K變化 ${m.change_pct}%，區間 ${m.low} 至 ${m.high}；不是即時行情或買賣建議。可問本機持倉，或輸入完整方向與手數建立草稿；一般問題目前無法自由回答。`,draft:null,provider:'local_rules'};
  }
 }
 

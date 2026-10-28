@@ -8,7 +8,7 @@
  {"id":"P07","target":"pages","text":"不要買進0.1手","expected":null,"note":"否定語句不建立草稿"},
  {"id":"P08","target":"pages","text":"如果買進0.1手會怎樣","expected":null,"note":"假設語句不建立草稿"},
  {"id":"P09","target":"pages","text":"分析回放行情與風險","expected":null,"note":"資訊詢問不建立委託"},
- {"id":"P10","target":"pages","text":"買進0手","reject":true,"note":"零手數拒絕，不產生持倉"},
+ {"id":"P10","target":"pages","text":"買進0手","expected":null,"note":"零手數明示拒絕，不建立草稿或持倉"},
  {"id":"R01","target":"rules","text":"單筆超過0.1手提醒我","expected":{"kind":"order_lot","value":"0.1","op":"gt"},"note":"先預覽，確認儲存才生效"},
  {"id":"R02","target":"rules","text":"總手數達到0.5手提醒我","expected":{"kind":"after_lot","value":"0.5","op":"gte"},"note":"總部位門檻"},
  {"id":"R03","target":"rules","text":"沒設定停損提醒我","expected":{"kind":"missing_sl","value":null},"note":"缺停損條件"},
