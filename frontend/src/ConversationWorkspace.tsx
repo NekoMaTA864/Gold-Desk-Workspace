@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {useEffect,useRef,useState,type FormEvent,type CSSProperties} from 'react';
 import {api} from './api';import type {Side} from './types';import type {DemoMarket} from './demoMarket';import type {MarketReply} from './LiveAssistant';
 import ConversationResize from './ConversationResize';import {CHAT_HEIGHT_KEY,savedChatHeight} from './chatSize';
@@ -9,7 +10,7 @@ import {DeskRail,DeskMarketHeader,DeskIcon} from './DeskChrome';
 import DeskAccountTray from './DeskAccountTray';
 type Interpretation={intent:string;analysis_side:Side|null;patch:InputPatch;proposal:InputPatch;message:string;missing_fields:string[];input_revision:number};
 type Turn={id:number;question:string;note?:string;noteImportant?:boolean;reply?:MarketReply;proposal?:InputPatch;proposalRevision?:number;error?:string;record?:ArchiveTurn};
-export default function ConversationWorkspace({market,light,visible,onHistory,onNavigate,onToggleTheme}:{market:DemoMarket|null;light:boolean;visible:boolean;onHistory:()=>void;onNavigate?:(view:'replay'|'live')=>void;onToggleTheme?:()=>void}){
+export default function ConversationWorkspace({market,light,visible,onHistory,onNavigate,onToggleTheme,tools}:{tools?:ReactNode;market:DemoMarket|null;light:boolean;visible:boolean;onHistory:()=>void;onNavigate?:(view:'replay'|'live')=>void;onToggleTheme?:()=>void}){
  const [archive,setArchive]=useState(()=>{try{return decodeArchive(typeof localStorage==='undefined'?null:localStorage.getItem(DESK_HISTORY_KEY));}catch{return {items:[],writable:false,error:'此瀏覽器無法保存對話。'};}});
  const [threadId,setThreadId]=useState(()=>`chat-${Date.now()}`),[historyError,setHistoryError]=useState(''),[mobileTicket,setMobileTicket]=useState(false);
  const [chatShare,setChatShare]=useState<number|null>(null);const grid=useRef<HTMLDivElement>(null);
@@ -87,7 +88,7 @@ export default function ConversationWorkspace({market,light,visible,onHistory,on
  const missing=missingInput(input);
  return <main id={visible?'market-workspace':undefined} className="conversation-workspace pd-workbench" hidden={!visible} tabIndex={-1} aria-label="聊天交易工作台">
   <DeskRail entries={archive.items} activeId={threadId} busy={busy||checking||locked} error={historyError||archive.error} onOpen={openThread} onNew={()=>openThread()} onNavigate={view=>onNavigate?.(view)}/>
-  <div className="pd-body"><DeskMarketHeader market={market} light={light} onToggleTheme={()=>onToggleTheme?.()}/>
+  <div className="pd-body"><DeskMarketHeader tools={tools} market={market} light={light} onToggleTheme={()=>onToggleTheme?.()}/>
   <div className="cw-heading"><div><span className="pd-eyebrow">YOUR TRADING WORKSPACE</span><h1>交易對話</h1></div><button className="pd-ticket-toggle" type="button" aria-expanded={mobileTicket} aria-controls="pd-ticket" onClick={()=>setMobileTicket(!mobileTicket)}>{mobileTicket?'收合委託':'準備中委託'}</button></div>
   {!liveQuoteReady&&<div className="cw-live-unavailable" role="status"><div><strong>cTrader DEMO 即時報價尚未就緒</strong><span>此頁無法提供可靠的即時盤面分析；不會用合成回放代替券商行情。</span></div>{onNavigate&&<button type="button" onClick={()=>onNavigate('replay')}>前往歷史回放</button>}</div>}
   <div className="cw-grid" ref={grid} style={chatShare===null?undefined:{'--cw-chat-weight':`${chatShare}fr`,'--cw-ticket-weight':`${100-chatShare}fr`} as CSSProperties}><section className="cw-conversation" aria-label="交易對話"><div className="cw-chat-toolbar"><label><input type="checkbox" checked={enabled} disabled={!configured||busy} onChange={e=>setEnabled(e.target.checked)}/>啟用 Groq 白話解讀</label>{!configured&&<span className="fine">Groq 未連線</span>}<button type="button" disabled={busy} onClick={()=>void send('更新目前盤面與案例')}>{newBar?'有新收盤 · 更新分析':'更新盤面'}</button></div>

@@ -7,4 +7,5 @@ import './productDesk.css';
 import './secondaryPages.css';
 import './integration.css';
 import './entry-integration.css';
+import './workspaceOptions.css';
 createRoot(document.getElementById('root')!).render(<React.StrictMode><IntegrationShell/></React.StrictMode>);
