@@ -1,4 +1,5 @@
 import AssistantExplanation from './AssistantExplanation';
+import TeamVerification from './TeamVerification';
 import WorkspaceDialog from './WorkspaceDialog';
 import {lazy,Suspense,useEffect,useRef,useState} from 'react';
 import EntryGate from './EntryGate';
@@ -30,7 +31,7 @@ export default function IntegrationShell(){
    {connectionsOpen&&<ConnectionCenter publicMode={publicMode} account={demoAccount} onClose={closeConnections}/>}
    {info&&<WorkspaceDialog title={info==='source'?'資料來源':info==='assistant'?'助手如何回答':'使用指引'} onClose={()=>setInfo(null)}>{info==='assistant'?<AssistantExplanation publicMode={publicMode}/>:info==='source'?<>
      {publicMode?<><p>歷史回放使用合成行情與模擬帳戶；委託只記錄在本次體驗中。</p><p>即時圖表來自 TradingView，僅供參考，與模擬成交價格不同。</p><p>歷史案例可供比較，過去結果不代表新交易的獲利機率。</p></>:<><p>即時報價與持倉以 cTrader DEMO 的連線狀態為準；未連線時不顯示舊報價。</p><p>能否比較相似案例，取決於已載入的資料及盤面是否完整；請查看連線狀態。</p></>}
-    </>:<><button type="button" className="assistant-help-link" onClick={()=>setInfo('assistant')}>助手如何回答？查看回答原則 →</button><FirstUseGuide onClose={()=>setInfo(null)}/></>}</WorkspaceDialog>}
+    </>:<><button type="button" className="assistant-help-link" onClick={()=>setInfo('assistant')}>助手如何回答？查看回答原則 →</button><TeamVerification/><FirstUseGuide onClose={()=>setInfo(null)}/></>}</WorkspaceDialog>}
    <Suspense fallback={<p className="integration-loading" role="status">正在載入工作台…</p>}><App/></Suspense>
   </div>}
  </>;

@@ -1,5 +1,41 @@
 # Gold Desk 交接紀錄
 
+## 2026-10-28：整合四階段與站內測試摘要發布準備
+
+使用者授權發布本輪累積修改。新增TeamVerification.tsx，使用指引內可直接展開30句原文／預期行為、178項前端測試與390px驗收摘要，內容共用docs/interaction-cases-30.json，明示程式解析不等於LLM或券商驗收。新增站內呈現測試，最新178項前端測試、10句正式解析、TypeScript、兩種建置通過。包含前述波動參考、五區核對、共用API／SSE、教學與操作測試；私人資料及建置產物不提交。
+
+以PR合併main後觸發Pages，部署結果以該合併提交的Actions為準。正常歷史保留，可revert本次合併提交回退。下方「本機未提交」為開發階段歷史紀錄，不代表發布後現況。
+
+## 2026-10-28：第四階段，教學、30句與390px操作（本機，未提交）
+
+新增 docs/interaction-cases-30.json與可讀清單：Pages10句、提醒10句、正式解析10句，各有預期欄位／行為與限制。frontend/tests/interaction-corpus.test.ts驗前20句及唯一ID；check_conversation_corpus.py呼叫既有純解析函式驗後10句，不啟動後端／券商／模型。測試找到personalRules.ts單位判斷將「單筆」的「筆」誤認數字單位，改為只拒絕數字後的筆單位；不改提醒門檻及數值算法。
+
+Education首次指引補成5步，加入五區核對、提醒與固定快照、未知委託注意事項；ConversationHelp補相同說明。docs/demo-script.md重寫成目前模擬可展示及後端接通後兩段，修正公開案例來源舊文字。非組員驗收依使用者指示未執行。
+
+177項前端測試、正式解析10句、TypeScript與兩種建置均通過。390×844新展示工作階段實際完成訪客入口、聊天草稿／取消、提醒預覽保存／觸發、模擬成交／平倉、回放紀錄、連線狀態與5步教學；檢查點無水平溢出。已移除測試提醒、還原視窗，保留此新工作階段的模擬進出場紀錄。實機鍵盤與正式後端未驗，詳docs/mobile-acceptance-20261028.md。沒有真券商或外部模型操作，未commit／push。
+
+## 2026-10-28：第三階段，共用 API／SSE 接線（本機，未提交）
+
+新增 backendTransport.ts 與6項測試。同源 /api JSON請求集中處理 credentials、取消訊號與可辨識錯誤；api.ts保留Pages模擬分流，ConversationWorkspace／LiveAssistant／BrokerClosePanel改共用請求，useLiveCandles改共用SSE建立入口。公開歷史資料與外部Groq代理仍維持獨立通道。沒有自動POST重試、登出、清草稿或送單。
+
+保留原有明確拒絕白名單與JSON detail條件；網路失敗、5xx或無效成功JSON不判成安全拒絕，不自動重送。修正api.ts原本將無效成功JSON轉成detail物件後回傳為成功的行為。既有斷線確認測試改核對CloseConfirmError.safeRejected=false、提醒勿重送與單次請求，不依賴瀏覽器英文錯誤字串。SSE斷線無法讀HTTP狀態，維持STALE與既有fallback，不推測401。
+
+TypeScript、156項前端測試、Pages及一般build、diff空白檢查通過。只用mock fetch／SSE測試，沒有真實券商操作或模型呼叫；遠端Session／SSE／多使用者權限仍待後端整合驗收。docs/frontend-service-integration-20261028.md列A–D待交付契約，未改API_CONTRACT或loopback限制。未commit／push。
+
+## 2026-10-28：第二階段，正式 DEMO 五區核對（本機，未提交）
+
+新增 BrokerReviewContents.tsx，與回放 IntegratedReview 共用五區外框、提醒與證據元件。ConversationOrderReview 只替換內容呈現，保留確認／取消／期限／防重送與查回報流程。核對 analysis_reply 與草稿的固定快照、時間和模式；案例另比對方向及快照，不一致顯示缺資料。CaseComparison 補顯示既有不同條件。正式規則未回傳時明示尚待接入，不說成無規則或未觸發。詳見 docs/broker-review-integration-20261028.md。
+
+新增合成 fixture、本機無送單驗收頁 frontend/dev/review-preview.html 及6項核對測試。TypeScript、150項前端測試、一般與Pages建置均通過；瀏覽器確認提醒觸發、錯快照保護，390px無水平溢出。驗收頁不包含在單入口正式建置中；正式元件已接線，真後端／券商端到端尚待環境驗收。無實際交易或Groq呼叫，未commit／push。下一階段為API／SSE接線盤點。
+
+## 2026-10-28：第一階段，整合 Brian 波動參考（本機，未提交）
+
+固定來源 brianlab0/Gold-Desk-Workspace@1808aaebd1720c5621204bc37be50291ec2dfb32，整合前端 rangeMath、VolatilityRange、groqFacts、衍生快照與測試；新增 volatilityContext 日期判斷。RiskReview 共用此區，回放與 ConversationOrderReview 均可查看。完整內容預設收合、直接顯示來源期間；預算結果改為情境參考手數，不改草稿。useId 避免多個元件重複輸入欄 ID。保留現有版型／提醒入口。
+
+晚於分析時間或分析時間未知時，固定快照只供獨立示範，Groq facts 不附加未來資料。只接前端，尚未接後端波動事實目錄、cTrader 原生波動或新規則；未動 API／後端算法／授權或送單。來源與限制見 docs/volatility-integration-20261028.md。
+
+驗證：TypeScript、144 項前端測試、一般與 Pages Vite build 均通過；diff 空白檢查通過。瀏覽器測試買進0.1手、停損距離12美元，200美元預算顯示參考0.16手、情境192美元，草稿仍為0.1手。390px視窗下頁面scrollWidth375、波動區306、表格280，無水平撐出；還原視窗後保留核對畫面。無實際券商交易或 Groq 呼叫。工作分支 codex/integrate-volatility-reference，未 commit／push。下一階段為正式 DEMO 五區核對共用。
+
 ## 2026-10-28：公開版本發布準備
 
 本次整合以下本地紀錄的最終狀態，透過 codex/layout-and-reminders PR 合併 main，觸發 Pages。三欄採畫面內兩條分隔線；先前獨立延伸方案已被取代。包含版型選單、共用提醒設定、連線／資料／指引浮層、次要頁面標題精簡與助手回答原則。未修改 API、LLM 推論、券商授權及交易計算，沒有移入 Kuan 10/27 的新計算流程。

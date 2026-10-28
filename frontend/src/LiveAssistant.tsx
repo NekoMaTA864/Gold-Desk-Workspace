@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import LiveVolumeAnalysis from './LiveVolumeAnalysis';
 import {api} from './api';
+import {requestBackendJSON} from './backendTransport';
 import type {Side} from './types';
 import CaseComparison,{type CaseComparisonData} from './CaseComparison';
 
@@ -38,8 +39,8 @@ export default function LiveAssistant({side}:{side:Side}){
   setMessages(items=>[...items,{question:text}]);request.current=new AbortController();
   const timer=window.setTimeout(()=>request.current?.abort(),60000);
   try{
-   const response=await fetch('/api/assistant/live-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,llm_enabled:enabled,previous_questions,side:querySide,include_cases:includeCases}),signal:request.current.signal});
-   const result=await response.json();if(!response.ok)throw Error(typeof result.detail==='string'?result.detail:'即時盤面分析失敗');
+   const result=await requestBackendJSON<MarketReply>('/assistant/live-chat',{message:text,llm_enabled:enabled,previous_questions,side:querySide,include_cases:includeCases},{signal:request.current.signal});
+   if(result===null)throw Error('盤面服務未提供有效結果，請稍後再試。');
    setMessages(items=>items.map((item,i)=>i===index?{...item,reply:result}:item));
   }catch(e){if(request.current?.signal.aborted)setError('分析逾時或已取消，可重新提問；沒有送出交易。');else setError(e instanceof Error?e.message:'無法取得盤面說明');}
   finally{window.clearTimeout(timer);lock.current=false;setBusy(false);}

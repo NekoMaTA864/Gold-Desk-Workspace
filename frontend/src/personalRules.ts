@@ -70,7 +70,7 @@ export function parseRuleMessage(message:string,rules:PersonalRule[]):RuleReply|
   if(m){value=m[1];op=/大於等於|至少|達到/.test(m[0])?'gte':'gt';}
  }
  if(!kind||(kind!=='missing_sl'&&value===null))return {message:help};
- if((['order_lot','after_lot'].includes(kind)&&/美元|USD|筆|%/.test(message))||(kind==='stop_loss_usd'&&/手|%/.test(message)))return {message:'數字單位不符合這個條件。'+help};
+ if((['order_lot','after_lot'].includes(kind)&&/美元|USD|\d\s*筆|%/i.test(message))||(kind==='stop_loss_usd'&&/手|%/.test(message)))return {message:'數字單位不符合這個條件。'+help};
  const r:PersonalRule={id:crypto.randomUUID(),kind,value,op,enabled:true,side};
  try{validateRules([r]);}catch(e){return {message:(e as Error).message};}
  return {message:'我理解為以下條件。確認儲存後才會生效。',proposal:{action:'save',rule:r}};
