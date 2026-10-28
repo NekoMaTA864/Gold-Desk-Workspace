@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {api} from './api';
 import type {DemoAccount} from './demoAuth';
 import type {DemoMarket} from './demoMarket';
@@ -10,6 +10,8 @@ type Loadable<T>={state:'loading'|'ready'|'error';value:T|null};
 const loading=<T,>():Loadable<T>=>({state:'loading',value:null});
 
 export default function ConnectionCenter({publicMode,account,onClose}:{publicMode:boolean;account:DemoAccount|null;onClose:()=>void}){
+ const dialog=useRef<HTMLDialogElement>(null);
+ useEffect(()=>{const el=dialog.current;if(!el)return;const previousOverflow=document.body.style.overflow;el.showModal();document.body.style.overflow='hidden';return()=>{el.close();document.body.style.overflow=previousOverflow;};},[]);
  const [assistant,setAssistant]=useState<Loadable<AssistantStatus>>(loading);
  const [broker,setBroker]=useState<Loadable<DemoMarket>>(loading);
  const [data,setData]=useState<Loadable<DataReadiness>>(loading);
@@ -26,16 +28,16 @@ export default function ConnectionCenter({publicMode,account,onClose}:{publicMod
   return()=>{active=false;};
  },[publicMode,refresh]);
  const retry=()=>{setAssistant(loading());setBroker(loading());setData(loading());setRefresh(value=>value+1);};
- const assistantLabel=publicMode?(groqProxyAvailable?'可選用 AI 解讀':'目前使用程式說明'):
-  assistant.state==='loading'?'查詢中':assistant.state==='error'?'狀態無法取得':assistant.value?.configured&&assistant.value.enabled?'可選用 AI 解讀':'目前使用程式說明';
+ const assistantLabel=publicMode?(groqProxyAvailable?'AI 可選用':'基本助手'):
+  assistant.state==='loading'?'查詢中':assistant.state==='error'?'狀態無法取得':assistant.value?.configured&&assistant.value.enabled?'AI 可選用':'基本助手';
  const assistantNote=assistantLabel==='查詢中'?'正在確認對話服務。':assistantLabel==='狀態無法取得'?'暫時無法確認對話服務，請重新檢查。':
-  assistantLabel==='可選用 AI 解讀'?'AI 可補充盤面說明；交易決定仍由你確認。':'目前由程式提供說明；AI 補充解讀尚未開啟。';
- const brokerLabel=publicMode?'未連接':broker.state==='loading'?'查詢中':broker.state==='error'?'狀態無法取得':
+  assistantLabel==='AI 可選用'?'AI 可補充盤面說明；交易決定仍由你確認。':'可使用基本助手整理想法與交易草稿。';
+ const brokerLabel=publicMode?'展示模式':broker.state==='loading'?'查詢中':broker.state==='error'?'狀態無法取得':
   broker.value?.connection_status==='NOT_CONFIGURED'?'尚未設定':broker.value?.connection_status==='CONNECTING'?'連線中':
   broker.value?.connection_status==='CONNECTED'&&broker.value.account?.status==='CURRENT'&&broker.value.quote.status==='CURRENT'?'DEMO 行情與帳戶已連線':
   broker.value?.connection_status==='CONNECTED'&&broker.value.account?.status==='CURRENT'?'DEMO 帳戶已連線 · 報價未就緒':
   broker.value?.connection_status==='CONNECTED'?'DEMO 行情已連線 · 帳戶未就緒':'未連線';
- const brokerNote=brokerLabel==='查詢中'?'正在確認即時服務。':brokerLabel==='狀態無法取得'?'暫時無法確認連線，請重新檢查。':
+ const brokerNote=publicMode?'目前使用合成回放與模擬帳戶。TradingView 圖表僅供外部參考。':brokerLabel==='查詢中'?'正在確認即時服務。':brokerLabel==='狀態無法取得'?'暫時無法確認連線，請重新檢查。':
   brokerLabel==='DEMO 行情與帳戶已連線'?'可查看 DEMO 行情與帳戶狀態；送單前仍須核對。':
   broker.value?.connection_status==='CONNECTED'?'部分即時資料可查看；報價或帳戶尚未齊備，暫不能據此送單。':
   '即時資料暫不可用；仍可使用歷史回放。';
@@ -47,14 +49,14 @@ export default function ConnectionCenter({publicMode,account,onClose}:{publicMod
   data.value.candidate_profile_status!=='READY'?'案例資料尚未完成核對，暫不提供盤面相似比較。':
   data.value.replay_market_is_synthetic?'歷史資料已載入；目前缺少可比較的即時盤面，暫無法進行相似案例分析。':
   '歷史資料已載入；相似比較仍須通過每次查詢的行情條件。';
- return <section className="connection-center" aria-labelledby="connection-center-title">
-  <div className="connection-center-heading"><div><h2 id="connection-center-title">目前可用的服務</h2><p>報價、分析與案例會依實際連線狀態更新。</p></div><div className="connection-center-actions">{!publicMode&&<button type="button" onClick={retry}>重新檢查</button>}<button type="button" onClick={onClose} aria-label="關閉服務狀態">關閉</button></div></div>
+ return <dialog ref={dialog} id="connection-center" className="connection-center connection-dialog" aria-modal="true" aria-labelledby="connection-center-title" onCancel={e=>{e.preventDefault();onClose();}} onClick={e=>{if(e.target!==e.currentTarget)return;const box=e.currentTarget.getBoundingClientRect();if(e.clientX<box.left||e.clientX>box.right||e.clientY<box.top||e.clientY>box.bottom)onClose();}}>
+  <div className="connection-center-heading"><div><h2 id="connection-center-title">連線狀態</h2><p>{publicMode?'目前使用展示模式，可直接體驗交易流程。':'查看對話服務、券商行情與帳戶是否可用。'}</p></div><button type="button" className="connection-dialog-close" autoFocus onClick={onClose} aria-label="關閉連線狀態">關閉</button></div>
   <div className="connection-center-rows">
-   <div className="connection-center-row"><div><h3>使用身分</h3><p>{account?`目前以「${account.displayName}」體驗工作台。`:'目前以訪客身分體驗工作台。'}展示紀錄不會同步至個人帳號。</p></div><strong className="connection-center-state">{account?'展示帳號':'訪客模式'}</strong></div>
-   <div className="connection-center-row"><div><h3>對話解讀</h3><p>{assistantNote}</p></div><strong className="connection-center-state">{assistantLabel}</strong></div>
-   <div className="connection-center-row"><div><h3>即時報價與持倉</h3><p>{brokerNote}</p></div><strong className="connection-center-state">{brokerLabel}</strong></div>
-   <div className="connection-center-row"><div><h3>歷史案例與盤面</h3><p>{dataNote}</p></div><strong className="connection-center-state">{dataLabel}</strong></div>
+   <div className="connection-center-row"><div><h3>對話助手</h3><p>{assistantNote}</p></div><strong className="connection-center-state">{assistantLabel}</strong></div>
+   <div className="connection-center-row"><div><h3>{publicMode?'行情與帳戶':'cTrader DEMO'}</h3><p>{brokerNote}</p></div><strong className="connection-center-state">{brokerLabel}</strong></div>
   </div>
-  <p className="connection-center-foot"><strong>後續預留</strong> 個人帳號同步 · 自選 AI 服務 · 連接個人 cTrader DEMO 帳戶</p>
- </section>;
+  {!publicMode&&<details className="connection-data-detail"><summary>案例資料可用情況 · {dataLabel}</summary><p>{dataNote}</p></details>}
+  <p className="connection-center-foot">{account?`展示帳號：${account.displayName}`:'訪客體驗'} · 展示紀錄不會同步至個人帳號。</p>
+  <div className="connection-center-actions">{!publicMode&&<button type="button" onClick={retry}>重新檢查</button>}<button type="button" onClick={onClose}>返回工作台</button></div>
+ </dialog>;
 }
